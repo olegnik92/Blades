@@ -1,0 +1,19 @@
+﻿.component {
+    color: red;
+}
+
+.comnet {
+    color: green;
+}
+
+.comnet.disabled{
+    color: gray;
+}
+
+.comnet-main{
+    color: yellow;
+}
+
+.component__row {
+    font-size: 12px;
+}
