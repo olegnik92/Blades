@@ -7,7 +7,7 @@ using Blades.Core;
 
 namespace Blades.Interfaces
 {
-    public interface ILogger
+    public interface ILogger: IBladesService
     {
         void Debug(string message);
 

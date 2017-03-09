@@ -7,7 +7,7 @@ using Blades.Core;
 
 namespace Blades.Interfaces
 {
-    public interface IOperationMetaInfoProvider
+    public interface IOperationMetaInfoProvider: IBladesService
     {
         OperationMetaInfo Get(string operationName);
     }

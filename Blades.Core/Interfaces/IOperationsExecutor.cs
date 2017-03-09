@@ -7,7 +7,7 @@ using Blades.Core;
 
 namespace Blades.Interfaces
 {
-    public interface IOperationsExecutor
+    public interface IOperationsExecutor: IBladesService
     {
         TResult Execute<TData, TResult>(string operationName, TData data, UserInfo user);
 

@@ -28,7 +28,7 @@ namespace Blades.Auth
             {
                 if(!checker.HasRequirement(User, req))
                 {
-                    return new List<string> { $"Пользователь не имеет прав: {req.Requirement}, на ресурс: {req.Recource.Description}" };
+                    return new List<string> { $"Пользователь не имеет прав: {req.Requirement}, на ресурс: {req.Recource.TypeDescription} --- {req.Recource.InstanceDescription}" };
                 }
             }
 

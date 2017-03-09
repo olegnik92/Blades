@@ -26,10 +26,13 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="BladesWeb\%40types\require.d.ts" />
+    <TypeScriptCompile Include="BladesWeb\tools\cookie.ts" />
     <TypeScriptCompile Include="BladesWeb\tools\json.ts" />
+    <TypeScriptCompile Include="BladesWeb\tools\noop.ts" />
     <TypeScriptCompile Include="BladesWeb\tools\storageTabsCommunicator.ts" />
     <TypeScriptCompile Include="BladesWeb\webApi\auth.ts" />
     <TypeScriptCompile Include="BladesWeb\webApi\requestExecutionError.ts" />
+    <TypeScriptCompile Include="BladesWeb\webApi\serverConnection.ts" />
     <TypeScriptCompile Include="BladesWeb\webApi\serverOperations.ts" />
     <TypeScriptCompile Include="BladesWeb\webApi\tokenInfo.ts" />
     <TypeScriptCompile Include="BladesWeb\webApi\xhr.ts" />

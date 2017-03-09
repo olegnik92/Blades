@@ -73,9 +73,9 @@
     <Compile Include="Interfaces\IAuthManager.cs" />
     <Compile Include="Interfaces\IPermissionRequirementChecker.cs" />
     <Compile Include="OAuthAuthorizationServerProvider.cs" />
+    <Compile Include="OAuthBearerAuthenticationProvider.cs" />
     <Compile Include="PermissionedOperation.cs" />
     <Compile Include="PermissionRequirement.cs" />
-    <Compile Include="PermissionResource.cs" />
     <Compile Include="PermissionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartupHelper.cs" />

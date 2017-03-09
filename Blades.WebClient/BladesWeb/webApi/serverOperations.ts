@@ -1,6 +1,8 @@
 ﻿import { Xhr } from './xhr';
+import { connection } from './serverConnection';
 import { Promise } from 'es6-promise';
 import { json } from '../tools/json';
+
 
 export abstract class BaseOperation {
 
@@ -42,6 +44,18 @@ export class JsonOperation extends BaseOperation {
         let xhr = this.createXhr();
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         return xhr.execute();
+    }
+
+
+    public executeViaConnection(): void {
+        let message = {
+            name: this.name,
+            requestType: this.requestType,
+            data: this.data
+        };
+
+        let messageStr = `${this.requestType}@@@@@${this.name}@@@@@${this.data}`;
+        connection.send(messageStr);
     }
 }
 

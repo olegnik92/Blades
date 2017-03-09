@@ -1,11 +1,10 @@
 ﻿import { JsonOperation } from 'blades-web/webApi/serverOperations';
 import { RequestExecutionError } from 'blades-web/webApi/requestExecutionError';
 import { Promise } from 'es6-promise';
-import { Xhr } from 'blades-web/webApi/xhr';
+import { connection } from 'blades-web/webApi/serverConnection';
 import { auth } from 'blades-web/webApi/auth';
 const css = require<any>('./test.css');
 
-Xhr.beforeExecution(xhr => Promise.resolve<Xhr>(auth.addAccessTokenToRequest(xhr)));
 
 describe('Jasmine own tests', () => {
     it('True to be true', () => {
@@ -192,7 +191,7 @@ describe('Xhr tests', () => {
                 done();
             }).catch((err: RequestExecutionError) => {
                 expect(err.status).toBe(403);
-                expect(err.message).toBe("Пользователь не имеет прав: Update, Delete, на ресурс: Тестовый ресурс");
+                expect(err.message).toBe("Пользователь не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
                 done();
             });
         });
@@ -213,4 +212,28 @@ describe('Xhr tests', () => {
         });
 
     });
+});
+
+
+describe('Web socket connection Tests', () => {
+    it('TestOperation.WebSocketOperation; test 1', (done) => {
+        let data = new Tuple<number, string, Date>();
+        data.item1 = 4
+        data.item2 = 'TesT';
+        data.item3 = new Date();
+
+        let operation = new JsonOperation('TestOperation.WebSocketOperation', data);
+        auth.authorize('admin', 'w').then(() => {
+            connection.open();
+            operation.executeViaConnection();
+        });
+
+        connection.onNotifyMessage('TestWsOp', (newData: Tuple<number, string, Date>) => {
+            expect(newData.item1).toBe(8);
+            expect(newData.item2).toBe('test');
+            expect(newData.item3.getFullYear()).toBe(data.item3.getFullYear() + 5);
+            done();
+        });
+    });
+
 });

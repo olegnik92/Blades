@@ -17,7 +17,7 @@ namespace Blades.Auth
             string tokenEndpointPath = "/token",
             TimeSpan? accessTokenExpireTimeSpan = null)
         {
-            var OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            var oAuthServerOptions = new OAuthAuthorizationServerOptions()
             {
                 AllowInsecureHttp = allowInsecureHttp,
                 TokenEndpointPath = new PathString(tokenEndpointPath),
@@ -25,10 +25,15 @@ namespace Blades.Auth
                 Provider = new OAuthAuthorizationServerProvider(authManager),               
             };
 
-            // Token Generation
 
-            appBuilder.UseOAuthAuthorizationServer(OAuthServerOptions);
-            appBuilder.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
+            var oAuthBearerOptions = new OAuthBearerAuthenticationOptions()
+            {
+                Provider = new OAuthBearerAuthenticationProvider()
+            };
+
+            // Token Generation
+            appBuilder.UseOAuthAuthorizationServer(oAuthServerOptions);
+            appBuilder.UseOAuthBearerAuthentication(oAuthBearerOptions);
         }
     }
 }

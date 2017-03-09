@@ -23,12 +23,14 @@ namespace BladesStartUp
 
             FileServerConfig(appBuilder);
 
-            Blades.Auth.StartupHelper.OAuthConfiguration(appBuilder, di.Container.Resolve<Blades.Auth.Interfaces.IAuthManager>());
+            Blades.Auth.StartupHelper.OAuthConfiguration(appBuilder, di.GetInstance<Blades.Auth.Interfaces.IAuthManager>(), accessTokenExpireTimeSpan: TimeSpan.FromSeconds(5));
 
 
             var config = Blades.Web.StartupHelper.InitWebApiConfiguration(appBuilder);
             di.InitControllerActivator(config);
             appBuilder.UseWebApi(config);
+
+            Blades.Web.StartupHelper.InitClientsConnection(appBuilder, di);
         }
 
         public void StaticFilesConfig(IAppBuilder appBuilder)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blades.Core;
 using Blades.Auth;
 using Blades.Auth.Interfaces;
+using Blades.Interfaces;
 
 namespace BladesStartUp
 {
@@ -15,7 +16,7 @@ namespace BladesStartUp
     {
         public override int Execute(out OperationExecutionReport executionReport)
         {
-            executionReport = new OperationExecutionReport() { ReportString = "OK" };
+            executionReport = new OperationExecutionReport("OK");
             return this.Data;
         }
     }
@@ -42,7 +43,7 @@ namespace BladesStartUp
     {
         public override ComplexDataType Execute(out OperationExecutionReport executionReport)
         {
-            executionReport = new OperationExecutionReport() { ReportString = "OK" };
+            executionReport = new OperationExecutionReport("OK");
             var result = new ComplexDataType
             {
                 SomeInt = 2 * Data.SomeInt,
@@ -66,13 +67,13 @@ namespace BladesStartUp
                 throw new ArgumentException("Data < 0");
             }
 
-            executionReport = new OperationExecutionReport() { ReportString = "Partial Complite" };
+            executionReport = new OperationExecutionReport("Partial Complite");
             if(Data > 0)
             {
                 throw new ArgumentException("Data > 0");
             }
 
-            executionReport.ReportString = "Full Complite";
+            executionReport.ReportStrings[0] = "Full Complite";
             return 0;
         }
     }
@@ -86,7 +87,7 @@ namespace BladesStartUp
 
         public override int Execute(out OperationExecutionReport executionReport)
         {
-            executionReport = new OperationExecutionReport() { ReportString = "OK" };
+            executionReport = new OperationExecutionReport("OK");
             return this.Data;
         }
     }
@@ -104,7 +105,7 @@ namespace BladesStartUp
             {
                 new PermissionRequirement
                 {
-                    Recource = new PermissionResource { Id = Guid.Empty, Description = "Тестовый ресурс"},
+                    Recource = new Resource { TypeId = Guid.Empty, TypeDescription = "Тестовый тип", InstanceDescription="Тестовый объект"},
                     Requirement = PermissionType.Delete | PermissionType.Update
                 }
             };
@@ -112,8 +113,27 @@ namespace BladesStartUp
 
         public override int Execute(out OperationExecutionReport executionReport)
         {
-            executionReport = new OperationExecutionReport() { ReportString = "OK" };
+            executionReport = new OperationExecutionReport("OK");
             return this.Data;
+        }
+    }
+
+    [Operation("TestOperation.WebSocketOperation", OperationType.Query, "Тестовая операция: WebSocketOperation")]
+    public class WebSocketOperation : PermissionedOperation<Tuple<int, string, DateTime>, object>
+    {
+        private IUsersNotifier notifier;
+        public WebSocketOperation(IPermissionRequirementChecker checker, IUsersNotifier notifier) : base(checker)
+        {
+            this.notifier = notifier;
+        }
+
+        public override object Execute(out OperationExecutionReport executionReport)
+        {
+            executionReport = new OperationExecutionReport("OK");
+            var data = Tuple.Create(Data.Item1 * 2, Data.Item2.ToLower(), Data.Item3.AddYears(5));
+            var message = new NotifyMessage<Tuple<int, string, DateTime>>() { Data = data, Name = "TestWsOp" };
+            notifier.SendMessage(User.Id, message);
+            return null;
         }
     }
 

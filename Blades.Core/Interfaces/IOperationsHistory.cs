@@ -7,7 +7,7 @@ using Blades.Core;
 
 namespace Blades.Interfaces
 {
-    public interface IOperationsHistory
+    public interface IOperationsHistory: IBladesService
     {
         void Put(OperationsHistoryItem item);
 

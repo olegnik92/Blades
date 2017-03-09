@@ -18,7 +18,7 @@ using Blades.Core;
 
 namespace BladesStartUp
 {
-    public class WindsorActivator: IOperationsActivator
+    public class WindsorActivator: IOperationsActivator, IBladesServiceLocator
     {
         public static IPermissionRequirementChecker PermissionsChecker { get; private set; }
 
@@ -37,14 +37,14 @@ namespace BladesStartUp
             container.Register(Component.For<IOperationsHistory>().ImplementedBy<MemoryHistory>());
             container.Register(Component.For<IOperationMetaInfoProvider>().ImplementedBy<OperationMetaInfoProvider>());
             container.Register(Component.For<IOperationsExecutor>().ImplementedBy<OperationsExecutor>());
-
+            container.Register(Component.For<IUsersNotifier>().ImplementedBy<UsersNotifier>());
             container.Register(Component.For<IOperationsActivator>().ImplementedBy<WindsorActivator>());
-            RegisterOperationTypes(container);
 
+            RegisterOperationTypes(container);
 
             container.Register(Component.For(new[] { typeof(IAuthManager), typeof(IPermissionRequirementChecker) }).ImplementedBy<BasisForTests>());
 
-            container.Register(Component.For<OperationController>().ImplementedBy<OperationController>().LifeStyle.Transient);
+            RegisterControllers(container);
         }
 
 
@@ -66,6 +66,11 @@ namespace BladesStartUp
             });
         }
 
+        private void RegisterControllers(IWindsorContainer container)
+        {
+            container.Register(Component.For<OperationController>().ImplementedBy<OperationController>().LifeStyle.Transient);
+        }
+
         public void InitControllerActivator(HttpConfiguration config)
         {
             config.Services.Replace(typeof(IHttpControllerActivator), new WindsorCompositionRoot(Container));
@@ -74,6 +79,11 @@ namespace BladesStartUp
         public Operation Create(Type operationType)
         {
             return (Operation)Container.Resolve(operationType);
+        }
+
+        public T GetInstance<T>() where T : IBladesService
+        {
+            return Container.Resolve<T>();
         }
     }
 

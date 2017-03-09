@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Owin.WebSocket;
+using Owin.WebSocket.Extensions;
+using Microsoft.Practices.ServiceLocation;
+using Blades.Interfaces;
 
 namespace Blades.Web
 {
@@ -21,7 +25,39 @@ namespace Blades.Web
             );
             webApiConfig.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             webApiConfig.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
+
             return webApiConfig;
+        }
+
+
+
+        public static void InitClientsConnection(IAppBuilder appBuilder, IBladesServiceLocator locator)
+        {
+            appBuilder.MapWebSocketRoute<ClientConnection>("/ws", new WebSocketServiceLocator(locator));
+        }
+    }
+
+
+    internal class WebSocketServiceLocator : ServiceLocatorImplBase
+    {
+        private IBladesServiceLocator locator;
+        public WebSocketServiceLocator(IBladesServiceLocator locator)
+        {
+            this.locator = locator;
+        }
+
+        protected override IEnumerable<object> DoGetAllInstances(Type serviceType)
+        {
+            return new object[] { DoGetInstance(serviceType, null) };
+        }
+
+        protected override object DoGetInstance(Type serviceType, string key)
+        {
+            if (serviceType.Equals(typeof(ClientConnection)))
+            {
+                return new ClientConnection(locator.GetInstance<IOperationMetaInfoProvider>(), locator.GetInstance<IOperationsExecutor>(), locator.GetInstance<ILogger>());
+            }
+            throw new ArithmeticException("Unknown service Type in WebSocketServiceLocator");
         }
     }
 }

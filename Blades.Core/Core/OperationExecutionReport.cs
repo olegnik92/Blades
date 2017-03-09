@@ -8,20 +8,22 @@ namespace Blades.Core
 {
     public class OperationExecutionReport
     {
-        public string ReportString { get; set; }
+        public List<string> ReportStrings { get; set; } = new List<string>();
 
         public List<string> Errors { get; set; } = new List<string>();
 
         public List<Resource> AssociatedResources { get; set; } = new List<Resource>();
 
-        public void InsertChildReport(OperationExecutionReport report)
+        public List<OperationExecutionReport> SubReports { get; private set; } = new List<OperationExecutionReport>();
+
+        public OperationExecutionReport()
         {
-            Errors.AddRange(report.Errors);
-            AssociatedResources.AddRange(report.AssociatedResources);
-            ReportString += $@"
-                Внутренняя операция:
-                {report.ReportString}
-            ";
+
+        }
+
+        public OperationExecutionReport(string reportString)
+        {
+            ReportStrings.Add(reportString);
         }
     }
 }

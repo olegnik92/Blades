@@ -46,6 +46,7 @@
     <Compile Include="Basis\OperationsActivator.cs" />
     <Compile Include="Basis\OperationsExecutor.cs" />
     <Compile Include="Basis\OperationMetaInfoProvider.cs" />
+    <Compile Include="Core\NotifyMessage.cs" />
     <Compile Include="Core\Operation.cs" />
     <Compile Include="Core\OperationAttribute.cs" />
     <Compile Include="Core\OperationExecutionReport.cs" />
@@ -58,11 +59,14 @@
     <Compile Include="Core\UserInfo.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\PrincipalExtensions.cs" />
+    <Compile Include="Interfaces\IBladesService.cs" />
+    <Compile Include="Interfaces\IBladesServiceLocator.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\IOperationMetaInfoProvider.cs" />
     <Compile Include="Interfaces\IOperationsActivator.cs" />
     <Compile Include="Interfaces\IOperationsExecutor.cs" />
     <Compile Include="Interfaces\IOperationsHistory.cs" />
+    <Compile Include="Interfaces\IUsersNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -17,15 +17,6 @@ using System.Web.Http.ValueProviders.Providers;
 
 namespace Blades.Web
 {
-    public class Test
-    {
-        public int a { get; set; }
-
-        public string b { get; set; }
-
-        public List<Tuple<double, string>> c { get; set; } = new List<Tuple<double, string>>();
-    }
-
     public class OperationController : ApiController
     {
         protected IOperationMetaInfoProvider metaInfo;
@@ -48,7 +39,7 @@ namespace Blades.Web
                 var requestType = Request.Headers.GetValues("x-blades-operation-request-type").FirstOrDefault();
                 var operationName = Request.Headers.GetValues("x-blades-operation-name").FirstOrDefault();
                 var operationMetaInfo = metaInfo.Get(operationName);
-                if (requestType == "JsonOperation")
+                if (requestType == OperationRequestTypes.JsonOperation)
                 {
                     string rawJson = await Request.Content.ReadAsStringAsync();
                     RequestData = JsonConvert.DeserializeObject(rawJson, operationMetaInfo.DataType);

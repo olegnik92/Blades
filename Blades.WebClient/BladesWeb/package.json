@@ -1,5 +1,5 @@
 {
-  "name": "blades-web",
+  "name": "blades",
   "version": "1.0.0",
   "description": "Blades Web Core module",
   "main": "index.js",

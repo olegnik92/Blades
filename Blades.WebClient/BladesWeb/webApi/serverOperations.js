@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var xhr_1 = require("./xhr");
+var serverConnection_1 = require("./serverConnection");
 var json_1 = require("../tools/json");
 var BaseOperation = (function () {
     function BaseOperation(name, data, requestType, requestMethod) {
@@ -35,6 +36,15 @@ var JsonOperation = (function (_super) {
         var xhr = this.createXhr();
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         return xhr.execute();
+    };
+    JsonOperation.prototype.executeViaConnection = function () {
+        var message = {
+            name: this.name,
+            requestType: this.requestType,
+            data: this.data
+        };
+        var messageStr = json_1.json.stringify(message);
+        serverConnection_1.connection.send(messageStr);
     };
     return JsonOperation;
 }(BaseOperation));
