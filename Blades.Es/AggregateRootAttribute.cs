@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Blades.Es
+{
+    public class AggregateRootAttribute: Attribute
+    {
+        public Guid ResourceTypeId { get; private set; }
+        public string ResourceTypeDescription { get; private set; }
+        public ulong SnapshotInterval { get; private set; }
+
+        public AggregateRootAttribute(string resourceTypeId, string resourceTypeDescription, ulong snapshotInterval = 100)
+        {
+            ResourceTypeId = Guid.Parse(resourceTypeId);
+            ResourceTypeDescription = resourceTypeDescription;
+            SnapshotInterval = snapshotInterval;
+        }
+    }
+}

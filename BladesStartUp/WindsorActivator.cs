@@ -15,6 +15,7 @@ using System.Web.Http.Dispatcher;
 using Blades.Auth.Interfaces;
 using Blades.Auth.Basis;
 using Blades.Core;
+using MongoDB.Driver;
 
 namespace BladesStartUp
 {
@@ -40,13 +41,27 @@ namespace BladesStartUp
             container.Register(Component.For<IUsersNotifier>().ImplementedBy<UsersNotifier>());
             container.Register(Component.For<IOperationsActivator>().ImplementedBy<WindsorActivator>());
 
+            
+
             RegisterOperationTypes(container);
+
+            RegisterDatabase(container);
 
             container.Register(Component.For(new[] { typeof(IAuthManager), typeof(IPermissionRequirementChecker) }).ImplementedBy<BasisForTests>());
 
             RegisterControllers(container);
         }
 
+
+        private void RegisterDatabase(IWindsorContainer container)
+        {
+            var dbClient = new MongoClient("mongodb://localhost:27017");
+            var db = dbClient.GetDatabase("BladesDataStore");
+
+            container.Register(Component.For<IMongoDatabase>().Instance(db));
+            container.Register(Component.For<Blades.DataStore.Interfaces.ITransactRepositoryFactory>().ImplementedBy<Blades.DataStore.Basis.TransactRepositoryFactory>());
+            container.Register(Component.For<Blades.DataStore.Es.EsRepository>().ImplementedBy<Blades.DataStore.Es.EsRepository>());
+        }
 
         private void RegisterOperationTypes(IWindsorContainer container)
         {

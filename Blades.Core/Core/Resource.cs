@@ -15,5 +15,15 @@ namespace Blades.Core
         public string TypeDescription { get; set; }
 
         public string InstanceDescription { get; set; }
+
+        public override string ToString()
+        {
+            return $"{TypeDescription} --- {InstanceDescription}";
+        }
+
+        public string ToFullString()
+        {
+            return $"{this} -:- ({TypeId} --- {InstanceId})";
+        }
     }
 }

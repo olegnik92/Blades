@@ -23,7 +23,7 @@ namespace BladesStartUp
 
             FileServerConfig(appBuilder);
 
-            Blades.Auth.StartupHelper.OAuthConfiguration(appBuilder, di.GetInstance<Blades.Auth.Interfaces.IAuthManager>(), accessTokenExpireTimeSpan: TimeSpan.FromSeconds(5));
+            Blades.Auth.StartupHelper.OAuthConfiguration(appBuilder, di.GetInstance<Blades.Auth.Interfaces.IAuthManager>(), accessTokenExpireTimeSpan: TimeSpan.FromDays(1));
 
 
             var config = Blades.Web.StartupHelper.InitWebApiConfiguration(appBuilder);

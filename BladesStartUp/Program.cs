@@ -17,6 +17,9 @@ namespace BladesStartUp
     {
         static void Main(string[] args)
         {
+            var d1 = DateTime.Now;
+            var d2 = DateTime.Now;
+
             Console.WriteLine("Start up project fired");
             string baseAddress = "http://localhost:9000/";
 

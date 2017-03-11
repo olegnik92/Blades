@@ -8,7 +8,7 @@ using Blades.Auth;
 using Blades.Auth.Interfaces;
 using Blades.Interfaces;
 
-namespace BladesStartUp
+namespace BladesStartUp.Operations
 {
 
     [Operation("TestOperation.EchoOperation", OperationType.Query, "Тестовая операция: echo")]

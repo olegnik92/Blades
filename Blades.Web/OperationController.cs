@@ -54,7 +54,6 @@ namespace Blades.Web
             }
             catch(OperationExecutionException err)
             {
-                log.Error(err);
                 var response = new HttpResponseMessage(GetHttpStatusCode(err.Status));
                 response.Content = new StringContent(string.Join("   \n", err.Errors));
                 return response;

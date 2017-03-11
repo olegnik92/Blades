@@ -3,23 +3,46 @@ import { auth } from 'blades-web/webApi/auth';
 import { JsonOperation } from 'blades-web/webApi/serverOperations';
 debugger;
 
-auth.onTokenInfoChanged(info => {
-    if (info) {
 
-        let operation = new JsonOperation('TestOperation.PermissionedFailedOperation', 7);
+class TestEntityState {
+    public id: string;
 
-        setTimeout(() => {
-            let ws = new WebSocket(`ws://${document.location.host}/ws`);
-            operation.execute();
-        }, 3000);
+    public num: number;
 
-        setTimeout(() => {
-            let ws = new WebSocket(`ws://${document.location.host}/ws`);
-            operation.execute();
-        }, 10000);
-    }
+    public name: string;
+};
 
+auth.authorize('someUser', 'w').then(() => {
+    var entity = new TestEntityState();
+    entity.name = Math.random().toFixed(5);
+    entity.num = -5;
+    new JsonOperation('SaveTestEntity', entity).execute().then((id: string) => {
+        debugger;
+        entity.id = id;
+        entity.name = entity.name += 'aaa';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        return new JsonOperation('AlterTestEntity', entity.id).execute();
+    }).then((id: string) => {
+        entity.name = entity.name += 'b';
+        return new JsonOperation('SaveTestEntity', entity).execute();
+    }).then((id: string) => {
+        return new JsonOperation('AlterTestEntity', entity.id).execute();
+    });
 
 });
-
-auth.authorize('someUser', 'w');

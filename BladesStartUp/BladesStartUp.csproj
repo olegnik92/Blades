@@ -81,6 +81,18 @@
       <HintPath>..\packages\Microsoft.Owin.StaticFiles.3.0.1\lib\net45\Microsoft.Owin.StaticFiles.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MongoDB.Bson, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Bson.2.4.3\lib\net45\MongoDB.Bson.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.2.4.3\lib\net45\MongoDB.Driver.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.4.3\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -97,6 +109,10 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Cors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -123,11 +139,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\RoleBase.cs" />
+    <Compile Include="Domain\TestEntity\AlterNumEvent.cs" />
+    <Compile Include="Domain\TestEntity\ChangeEvent.cs" />
+    <Compile Include="Domain\TestEntity\CreateEvent.cs" />
+    <Compile Include="Domain\TestEntity\TestEntityAr.cs" />
+    <Compile Include="Domain\TestEntity\TestEntityState.cs" />
+    <Compile Include="Domain\UserBase.cs" />
+    <Compile Include="Domain\UsersList\AddUserEvent.cs" />
+    <Compile Include="Domain\UsersList\ChangeUserEvent.cs" />
+    <Compile Include="Domain\UsersList\UsersListAr.cs" />
+    <Compile Include="Domain\UsersList\UsersListState.cs" />
+    <Compile Include="Operations\SaveUser.cs" />
+    <Compile Include="Domain\ResourceTypePermission.cs" />
+    <Compile Include="Domain\Role\CreateEvent.cs" />
+    <Compile Include="Domain\Role\ResourcePermissionsMutationEvent.cs" />
+    <Compile Include="Domain\Role\RoleAr.cs" />
+    <Compile Include="Domain\Role\RoleState.cs" />
+    <Compile Include="Domain\User\ChangeEvent.cs" />
+    <Compile Include="Domain\User\CreateEvent.cs" />
+    <Compile Include="Domain\User\ResourcePermissionsMutationEvent.cs" />
+    <Compile Include="Domain\User\UserAr.cs" />
+    <Compile Include="Domain\User\UserState.cs" />
     <Compile Include="OperationController.cs" />
+    <Compile Include="Operations\TestEntityOperations.cs" />
+    <Compile Include="Operations\TransactOperation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="TestOperations.cs" />
+    <Compile Include="Operations\TestOperations.cs" />
     <Compile Include="WindsorActivator.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +185,14 @@
       <Project>{6285927e-88a7-4dde-ada4-2e389be8bb2e}</Project>
       <Name>Blades.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Blades.DataStore\Blades.DataStore.csproj">
+      <Project>{0bce5a0a-a774-4c3f-b8f9-3498ca3cca3c}</Project>
+      <Name>Blades.DataStore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blades.Es\Blades.Es.csproj">
+      <Project>{9136ac2a-607e-459b-883c-e4bd7d3e3775}</Project>
+      <Name>Blades.Es</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Blades.Web\Blades.Web.csproj">
       <Project>{fc0e8f0b-d116-4add-8e7b-f531af8f7727}</Project>
       <Name>Blades.Web</Name>
@@ -156,7 +204,9 @@
     <Content Include="public\jasmine\index.html" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Dto\" />
+  </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="frontend\%40types\require.d.ts" />
     <TypeScriptCompile Include="frontend\main.ts" />
@@ -166,6 +216,10 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
