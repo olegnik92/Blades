@@ -70,7 +70,7 @@ namespace Blades.Commands.Basis
             catch (Exception e)
             {
                 report = new OperationExecutionReport("Ошибка при обработке команды");
-                report.Errors.Add(e.Message);
+                report.Errors.Add(new Error(e));
             }
 
             return report;

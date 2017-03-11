@@ -10,17 +10,17 @@ namespace Blades.Core
     {
         public OperationExecutionStatus Status { get; set; }
 
-        public List<string> Errors { get; set; }
+        public List<Error> Errors { get; set; }
 
-        public OperationExecutionException(string message, OperationExecutionStatus status)
-            : base(message)
+        public OperationExecutionException(Error error, OperationExecutionStatus status)
+            : base(error.Message)
         {
-            Errors = new List<string> { message };
+            Errors = new List<Error> { error };
             Status = status;
         }
 
-        public OperationExecutionException(List<string> errors, OperationExecutionStatus status)
-            :base(string.Join("\n", errors.Select(e => $"[ {e} ]")))
+        public OperationExecutionException(List<Error> errors, OperationExecutionStatus status)
+            :base(string.Join("\n", errors.Select(e => $"[ {e.Message} ]")))
         {
             Errors = errors;
             Status = status;

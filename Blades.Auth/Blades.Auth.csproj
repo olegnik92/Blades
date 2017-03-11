@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\PermissionException.cs" />
     <Compile Include="Basis\BasisForTests.cs" />
     <Compile Include="Interfaces\IAuthManager.cs" />
     <Compile Include="Interfaces\IPermissionRequirementChecker.cs" />

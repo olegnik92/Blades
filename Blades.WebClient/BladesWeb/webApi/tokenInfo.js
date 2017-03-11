@@ -20,4 +20,3 @@ var TokenInfo = (function () {
     return TokenInfo;
 }());
 exports.TokenInfo = TokenInfo;
-//# sourceMappingURL=tokenInfo.js.map

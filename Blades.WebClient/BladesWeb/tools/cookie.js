@@ -43,4 +43,3 @@ var CookieApi = (function () {
 }());
 exports.CookieApi = CookieApi;
 exports.cookie = new CookieApi();
-//# sourceMappingURL=cookie.js.map

@@ -74,4 +74,3 @@ var Auth = (function () {
 }());
 exports.Auth = Auth;
 exports.auth = new Auth('accessTokenInfo', 'accessToken');
-//# sourceMappingURL=auth.js.map

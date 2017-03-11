@@ -80,7 +80,7 @@ namespace BladesStartUp.Operations
             isAsync = true;
         }
 
-        public override List<string> GetDataValidationErrors()
+        public override List<Error> GetDataValidationErrors()
         {
             return base.GetDataValidationErrors();
         }

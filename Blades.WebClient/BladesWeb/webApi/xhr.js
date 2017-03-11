@@ -111,4 +111,3 @@ var Xhr = (function () {
 Xhr.beforeExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
 Xhr.afterExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
 exports.Xhr = Xhr;
-//# sourceMappingURL=xhr.js.map

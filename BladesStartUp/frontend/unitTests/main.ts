@@ -191,7 +191,7 @@ describe('Xhr tests', () => {
                 done();
             }).catch((err: RequestExecutionError) => {
                 expect(err.status).toBe(403);
-                expect(err.message).toBe("Пользователь не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
+                expect(err.message).toBe("Пользователь someuser не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
                 done();
             });
         });

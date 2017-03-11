@@ -16,5 +16,7 @@ namespace Blades.Interfaces
         void Warning(string message);
 
         void Error(Exception error);
+
+        void Error(Error error);
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="Basis\OperationsActivator.cs" />
     <Compile Include="Basis\OperationsExecutor.cs" />
     <Compile Include="Basis\OperationMetaInfoProvider.cs" />
+    <Compile Include="Core\Error.cs" />
     <Compile Include="Core\NotifyMessage.cs" />
     <Compile Include="Core\Operation.cs" />
     <Compile Include="Core\OperationAttribute.cs" />

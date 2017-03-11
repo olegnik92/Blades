@@ -24,6 +24,7 @@ namespace Blades.Core
 
         public OperationExecutionReport Report { get; set; }
 
+        public OperationType OperationType { get; set; }
 
         public OperationsHistoryItem() { }
 
@@ -34,6 +35,7 @@ namespace Blades.Core
             Name = operation.Name;
             User = operation.User;
             Title = operation.Title;
+            OperationType = operation.Type;
             Time = DateTime.Now;         
         }
     }

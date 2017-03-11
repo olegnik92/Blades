@@ -10,7 +10,7 @@ namespace Blades.Core
     {
         public List<string> ReportStrings { get; set; } = new List<string>();
 
-        public List<string> Errors { get; set; } = new List<string>();
+        public List<Error> Errors { get; set; } = new List<Error>();
 
         public List<Resource> AssociatedResources { get; set; } = new List<Resource>();
 

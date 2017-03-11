@@ -48,7 +48,7 @@ namespace Blades.Basis
             catch(Exception error)
             {
                 log.Error(error);
-                throw new OperationExecutionException(error.Message, OperationExecutionStatus.InfrastructureErrors);
+                throw new OperationExecutionException(new Error(error), OperationExecutionStatus.InfrastructureErrors);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Blades.Basis
             catch (Exception error)
             {
                 log.Error(error);
-                throw new OperationExecutionException(error.Message, OperationExecutionStatus.InfrastructureErrors);
+                throw new OperationExecutionException(new Error(error), OperationExecutionStatus.InfrastructureErrors);
             }          
         }
 
@@ -88,7 +88,7 @@ namespace Blades.Basis
             catch (Exception error)
             {
                 log.Error(error);
-                throw new OperationExecutionException(error.Message, OperationExecutionStatus.InfrastructureErrors);
+                throw new OperationExecutionException(new Error(error), OperationExecutionStatus.InfrastructureErrors);
             }           
         }
 
@@ -101,7 +101,7 @@ namespace Blades.Basis
             }
 
             var histItem = new OperationsHistoryItem(operation);
-            List<string> errors;             
+            List<Error> errors;             
                              
             try
             {
@@ -110,12 +110,12 @@ namespace Blades.Basis
             catch(UnauthorizedAccessException error)
             {
                 log.Error(error);
-                throw new OperationExecutionException(error.Message, OperationExecutionStatus.AuthorizationErrors);
+                throw new OperationExecutionException(new Error(error), OperationExecutionStatus.AuthorizationErrors);
             }
             catch(Exception error)
             {
                 log.Error(error);
-                errors = new List<string> { error.Message };
+                errors = new List<Error> { new Error(error) };
             }
             if (!errors.IsNullOrEmpty())
             {
@@ -133,7 +133,7 @@ namespace Blades.Basis
             catch (Exception error)
             {
                 log.Error(error);
-                errors = new List<string> { error.Message };
+                errors = new List<Error> { new Error(error) };
             }
             if (!errors.IsNullOrEmpty())
             {
@@ -157,13 +157,13 @@ namespace Blades.Basis
                 if(error.InnerException != null)
                 {
                     log.Error(error.InnerException);
-                    errors = new List<string> { error.InnerException.Message };
+                    errors = new List<Error> { new Error(error.InnerException) };
                 }
             }
             catch (Exception error)
             {
                 log.Error(error);
-                errors = new List<string> { error.Message };
+                errors = new List<Error> { new Error(error) };
             }
 
             if(report == null)

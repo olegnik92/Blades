@@ -35,12 +35,12 @@ namespace Blades.Core
 
         public virtual UserInfo User { get; set; }
 
-        public virtual List<string> GetDataValidationErrors()
+        public virtual List<Error> GetDataValidationErrors()
         {
             return null;
         }
 
-        public virtual List<string> GetPermissionsValidationErrors()
+        public virtual List<Error> GetPermissionsValidationErrors()
         {
             return null;
         }

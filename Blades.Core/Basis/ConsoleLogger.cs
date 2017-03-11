@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Blades.Interfaces;
 using System.Diagnostics;
+using Blades.Core;
 
 namespace Blades.Basis
 {
@@ -25,6 +26,12 @@ namespace Blades.Basis
         }
 
         public void Error(Exception error)
+        {
+            Console.WriteLine($"ERROR : {DateTime.Now} : {CodePlace} : {error.Message}");
+            Console.WriteLine(error.StackTrace);
+        }
+
+        public void Error(Error error)
         {
             Console.WriteLine($"ERROR : {DateTime.Now} : {CodePlace} : {error.Message}");
             Console.WriteLine(error.StackTrace);

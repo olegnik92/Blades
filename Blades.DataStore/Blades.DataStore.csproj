@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basis\HistoryRepository.cs" />
     <Compile Include="Interfaces\ITransactRepositoryFactory.cs" />
     <Compile Include="Basis\TransactRepositoryFactory.cs" />
     <Compile Include="Es\AggregateStateStoreItem.cs" />
@@ -71,6 +72,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Blades.Commands\Blades.Commands.csproj">
+      <Project>{84210193-08a8-4cb6-92df-bb9447eb8e14}</Project>
+      <Name>Blades.Commands</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Blades.Core\Blades.Core.csproj">
       <Project>{6285927e-88a7-4dde-ada4-2e389be8bb2e}</Project>
       <Name>Blades.Core</Name>

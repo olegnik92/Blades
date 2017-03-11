@@ -17,7 +17,7 @@ namespace Blades.Auth
             this.checker = checker;
         }
 
-        public override List<string> GetPermissionsValidationErrors()
+        public override List<Error> GetPermissionsValidationErrors()
         {
             if(User?.IsGuest() ?? true)
             {
@@ -28,7 +28,7 @@ namespace Blades.Auth
             {
                 if(!checker.HasRequirement(User, req))
                 {
-                    return new List<string> { $"Пользователь не имеет прав: {req.Requirement}, на ресурс: {req.Recource}" };
+                    return new List<Error> { new Error(new PermissionException(User, req)) };
                 }
             }
 

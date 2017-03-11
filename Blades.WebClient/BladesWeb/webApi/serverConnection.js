@@ -3,7 +3,7 @@ var json_1 = require("../tools/json");
 var noop_1 = require("../tools/noop");
 var ServerConnection = (function () {
     function ServerConnection() {
-        this.connectionProtocol = 'ws'; //or wss
+        this.connectionProtocol = 'ws';
         this.connectionRoute = 'ws';
         this.reconnectTimeout = 15000;
         this.reconnectIntervalRef = 0;
@@ -122,4 +122,3 @@ var ServerConnection = (function () {
 }());
 exports.ServerConnection = ServerConnection;
 exports.connection = new ServerConnection();
-//# sourceMappingURL=serverConnection.js.map
