@@ -139,17 +139,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Commands\TestCommand.cs" />
     <Compile Include="Domain\RoleBase.cs" />
     <Compile Include="Domain\TestEntity\AlterNumEvent.cs" />
     <Compile Include="Domain\TestEntity\ChangeEvent.cs" />
     <Compile Include="Domain\TestEntity\CreateEvent.cs" />
     <Compile Include="Domain\TestEntity\TestEntityAr.cs" />
+    <Compile Include="Domain\TestEntity\TestEntityCommandsReceiver.cs" />
     <Compile Include="Domain\TestEntity\TestEntityState.cs" />
     <Compile Include="Domain\UserBase.cs" />
     <Compile Include="Domain\UsersList\AddUserEvent.cs" />
     <Compile Include="Domain\UsersList\ChangeUserEvent.cs" />
     <Compile Include="Domain\UsersList\UsersListAr.cs" />
     <Compile Include="Domain\UsersList\UsersListState.cs" />
+    <Compile Include="Operations\CommandOperation.cs" />
     <Compile Include="Operations\SaveUser.cs" />
     <Compile Include="Domain\ResourceTypePermission.cs" />
     <Compile Include="Domain\Role\CreateEvent.cs" />
@@ -180,6 +183,10 @@
     <ProjectReference Include="..\Blades.Auth\Blades.Auth.csproj">
       <Project>{56b834fc-8d49-4c83-9b92-3ad6032bed4c}</Project>
       <Name>Blades.Auth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blades.Commands\Blades.Commands.csproj">
+      <Project>{84210193-08a8-4cb6-92df-bb9447eb8e14}</Project>
+      <Name>Blades.Commands</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blades.Core\Blades.Core.csproj">
       <Project>{6285927e-88a7-4dde-ada4-2e389be8bb2e}</Project>

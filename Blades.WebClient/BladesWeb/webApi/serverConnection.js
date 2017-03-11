@@ -15,6 +15,9 @@ var ServerConnection = (function () {
     }
     ServerConnection.prototype.open = function () {
         var _this = this;
+        if (this.isOpen) {
+            return;
+        }
         this.connect();
         clearInterval(this.reconnectIntervalRef);
         this.reconnectIntervalRef = setInterval(function () {
@@ -31,6 +34,9 @@ var ServerConnection = (function () {
     };
     Object.defineProperty(ServerConnection.prototype, "isOpen", {
         get: function () {
+            if (!this.ws) {
+                return false;
+            }
             return this.ws.readyState === WebSocket.OPEN;
         },
         enumerable: true,

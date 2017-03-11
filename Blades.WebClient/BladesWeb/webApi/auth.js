@@ -32,7 +32,7 @@ var Auth = (function () {
         var tokenInfo = tokenInfo_1.TokenInfo.fromJson(tokenInfoJson);
         return tokenInfo;
     };
-    Auth.prototype.addAccessTokenToRequest = function (xhr) {
+    Auth.prototype.addAccessTokenToRequestHeader = function (xhr) {
         var tokenInfo = this.getTokenInfo();
         if (!tokenInfo) {
             return xhr;
@@ -51,6 +51,7 @@ var Auth = (function () {
     };
     Auth.prototype.clearTokenInfo = function () {
         localStorage.removeItem(this.accessTokenInfoStorageKey);
+        cookie_1.cookie.deleteCookie(this.accessTokenCookieName);
         this.tokenInfoChanged(null);
     };
     Auth.prototype.onTokenInfoChanged = function (handler) {

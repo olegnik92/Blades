@@ -8,6 +8,8 @@ using Blades.DataStore.Es;
 using Blades.Core;
 using Blades.Auth.Interfaces;
 using Blades.DataStore.Interfaces;
+using BladesStartUp.Domain.Commands;
+using Blades.Commands.Interfaces;
 
 namespace BladesStartUp.Operations
 {
@@ -67,6 +69,20 @@ namespace BladesStartUp.Operations
             entity.Mutate(alterEvent);
 
             return entity.State.Num;
+        }
+    }
+
+    [Operation("TestEntityTestCommand", OperationType.Command, "TestEntityTestCommand")]
+    public class TestEntityTestCommand : CommandOperation<SaveTestEntityCommand>
+    {
+        public TestEntityTestCommand(ICommandEmitter emitter, IPermissionRequirementChecker checker) : base(emitter, checker)
+        {
+            isAsync = true;
+        }
+
+        public override List<string> GetDataValidationErrors()
+        {
+            return base.GetDataValidationErrors();
         }
     }
 

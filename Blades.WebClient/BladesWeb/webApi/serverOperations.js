@@ -43,7 +43,7 @@ var JsonOperation = (function (_super) {
             requestType: this.requestType,
             data: this.data
         };
-        var messageStr = json_1.json.stringify(message);
+        var messageStr = this.requestType + "@@@@@" + this.name + "@@@@@" + this.data;
         serverConnection_1.connection.send(messageStr);
     };
     return JsonOperation;

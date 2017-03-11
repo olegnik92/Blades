@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades.Es", "Blades.Es\Blad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades.DataStore", "Blades.DataStore\Blades.DataStore.csproj", "{0BCE5A0A-A774-4C3F-B8F9-3498CA3CCA3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades.Commands", "Blades.Commands\Blades.Commands.csproj", "{84210193-08A8-4CB6-92DF-BB9447EB8E14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{0BCE5A0A-A774-4C3F-B8F9-3498CA3CCA3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BCE5A0A-A774-4C3F-B8F9-3498CA3CCA3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BCE5A0A-A774-4C3F-B8F9-3498CA3CCA3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84210193-08A8-4CB6-92DF-BB9447EB8E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84210193-08A8-4CB6-92DF-BB9447EB8E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84210193-08A8-4CB6-92DF-BB9447EB8E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84210193-08A8-4CB6-92DF-BB9447EB8E14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
