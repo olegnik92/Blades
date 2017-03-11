@@ -72,13 +72,13 @@
     <Compile Include="Basis\BasisForTests.cs" />
     <Compile Include="Interfaces\IAuthManager.cs" />
     <Compile Include="Interfaces\IPermissionRequirementChecker.cs" />
-    <Compile Include="OAuthAuthorizationServerProvider.cs" />
-    <Compile Include="OAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="PermissionedOperation.cs" />
-    <Compile Include="PermissionRequirement.cs" />
-    <Compile Include="PermissionType.cs" />
+    <Compile Include="Auth\OAuthAuthorizationServerProvider.cs" />
+    <Compile Include="Auth\OAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Auth\PermissionedOperation.cs" />
+    <Compile Include="Auth\PermissionRequirement.cs" />
+    <Compile Include="Auth\PermissionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StartupHelper.cs" />
+    <Compile Include="Auth\StartupHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Blades.Core\Blades.Core.csproj">
@@ -87,6 +87,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Blades.Auth.nuspec" />
+    <None Include="nuget_pack.cmd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Nikishin Oleg</authors>
+    <owners>Nikishin Oleg</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Blades library. Core auth features</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2017</copyright>
+  </metadata>
+</package>

@@ -1,7 +1,7 @@
 {
   "name": "blades",
   "version": "1.0.0",
-  "description": "Blades Web Core module",
+  "description": "Blades library. Core typescript tools for Blades backend and browser API.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

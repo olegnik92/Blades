@@ -83,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Blades.Web.nuspec" />
+    <None Include="nuget_pack.cmd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
