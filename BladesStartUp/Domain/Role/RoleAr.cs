@@ -27,7 +27,7 @@ namespace BladesStartUp.Domain.Role
             return resource;
         }
 
-        public RoleAr(IEsRepository repo, Resource resource) : base(repo, resource)
+        public RoleAr(IEsRepository repo, Resource resource) : base(repo, resource, 0)
         {
         }
 

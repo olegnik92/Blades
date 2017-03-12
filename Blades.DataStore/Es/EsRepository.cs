@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Blades.Core;
 using Blades.Es;
-using Blades.Es.Interfaces;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Blades.DataStore.Interfaces;
@@ -28,9 +27,9 @@ namespace Blades.DataStore.Es
             return db.GetCollection<MutationEventStoreItem>($"MutationEvents_{resourceTypeId}");
         }
 
-        private IMongoCollection<AggregateStateStoreItem<TState>> GetSnapshotsCollection<TState>(Guid resourceTypeId)
+        private IMongoCollection<AggregateStateStoreItem<TState>> GetSnapshotsCollection<TState>(Guid resourceTypeId, byte detalizationLevel)
         {
-            return db.GetCollection<AggregateStateStoreItem<TState>>($"Snapshots_{resourceTypeId}");
+            return db.GetCollection<AggregateStateStoreItem<TState>>($"Snapshots_{resourceTypeId}_{detalizationLevel}");
         }
 
         public List<MutationEvent> GetEvents(Resource resource, ulong startVersion)
@@ -44,9 +43,21 @@ namespace Blades.DataStore.Es
             return result.ToList();
         }
 
-        public TState GetLastSnapshot<TState>(Resource resource, out ulong version)
+        public List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, ulong startVersion)
         {
-            var snapshots = GetSnapshotsCollection<TState>(resource.TypeId).AsQueryable()
+            var result = GetEventsCollection(resource.TypeId).AsQueryable()
+                .Where(item => item.ResourceInstanceId == resource.InstanceId)
+                .Where(item => item.MutationEvent.DetalizationLevel <= detalizationLevel)
+                .Where(item => item.MutationEvent.BaseVersion >= startVersion)
+                .OrderBy(item => item.MutationEvent.BaseVersion)
+                .Select(item => item.MutationEvent);
+
+            return result.ToList();
+        }
+
+        public TState GetLastSnapshot<TState>(Resource resource, byte detalizationLevel, out ulong version)
+        {
+            var snapshots = GetSnapshotsCollection<TState>(resource.TypeId, detalizationLevel).AsQueryable()
                 .Where(item => item.ResourceInstanceId == resource.InstanceId);
 
             var ver = snapshots.Any() ? snapshots.Max(s => s.Version) : 0;
@@ -64,6 +75,14 @@ namespace Blades.DataStore.Es
                 .Max(item => item.MutationEvent.BaseVersion);
 
             return maxBaseVer + 1;
+        }
+
+
+        public List<Guid> GetAllInstanceIds(Guid reosurceTypeId)
+        {
+            return GetEventsCollection(reosurceTypeId).AsQueryable()
+                .Select(e => e.ResourceInstanceId)
+                .Distinct().ToList();
         }
 
         public void PushEvent(Resource resource, MutationEvent mutation)
@@ -88,7 +107,7 @@ namespace Blades.DataStore.Es
         }
 
 
-        public void PushSnapshot<TState>(Resource resource, TState state, ulong version)
+        public void PushSnapshot<TState>(Resource resource, TState state, byte detalizationLevel, ulong version)
         {
             var storeItem = new AggregateStateStoreItem<TState>()
             {
@@ -98,10 +117,11 @@ namespace Blades.DataStore.Es
                 Version = version
             };
 
-            GetSnapshotsCollection<TState>(resource.TypeId).InsertOne(storeItem);
+            GetSnapshotsCollection<TState>(resource.TypeId, detalizationLevel).InsertOne(storeItem);
         }
 
 
+        private object locker = new object();
         public void Commit()
         {
             if(unsavedEvents == null)
@@ -109,10 +129,24 @@ namespace Blades.DataStore.Es
                 return;
             }
 
-            foreach(var group in unsavedEvents.GroupBy(e => e.ResourceTypeId))
+            var instanceEventsChains = unsavedEvents.GroupBy(e => e.ResourceInstanceId)
+                .Select(group => group.OrderBy(e => e.MutationEvent.BaseVersion)).ToList();
+
+            lock (locker)
             {
-                GetEventsCollection(group.Key).InsertMany(group);
+                foreach (var instanceEventsChain in instanceEventsChains)
+                {
+                    var firstEvent = instanceEventsChain.First();
+                    var resource = new Resource() { TypeId = firstEvent.ResourceTypeId, InstanceId = firstEvent.ResourceInstanceId };
+                    var version = GetVersion(resource);
+                    if(version != firstEvent.MutationEvent.BaseVersion)
+                    {
+                        throw new VersionConsistencyException(resource, firstEvent.MutationEvent, version);
+                    }
+                    GetEventsCollection(firstEvent.ResourceTypeId).InsertMany(instanceEventsChain);
+                }
             }
+
             unsavedEvents = null;
         }
 

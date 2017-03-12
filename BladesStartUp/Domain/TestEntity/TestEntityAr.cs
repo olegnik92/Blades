@@ -29,7 +29,7 @@ namespace BladesStartUp.Domain.TestEntity
             return resource;
         }
 
-        public TestEntityAr(IEsRepository repo, Resource resource) : base(repo, resource)
+        public TestEntityAr(IEsRepository repo, Resource resource) : base(repo, resource, 0)
         {
         }
 

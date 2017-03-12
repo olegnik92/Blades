@@ -29,7 +29,7 @@ namespace BladesStartUp.Domain.User
             return resource;
         }
 
-        public UserAr(IEsRepository repo, Resource resource) : base(repo, resource)
+        public UserAr(IEsRepository repo, Resource resource) : base(repo, resource, 0)
         {
         }
 

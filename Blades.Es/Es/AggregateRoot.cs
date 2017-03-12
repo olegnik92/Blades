@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 
 namespace Blades.Es
 {
-    public class AggregateRoot<TState>
+    public abstract class AggregateRoot<TState>
     {
         private IEsRepository repo;
         public Resource Resource { get; private set; }
         public TState State { get; private set; }
+        public byte DetalizationLevel { get; private set; }
 
         public AggregateRootAttribute AggregateInfo { get; private set; }
 
         public ulong Version { get; private set; }
 
-        public AggregateRoot(IEsRepository repo, Resource resource)
+        public AggregateRoot(IEsRepository repo, Resource resource, byte detalizationLevel)
         {
             AggregateInfo = Attribute.GetCustomAttribute(this.GetType(), typeof(AggregateRootAttribute)) as AggregateRootAttribute;
             if (AggregateInfo == null)
@@ -28,35 +29,46 @@ namespace Blades.Es
 
             this.repo = repo;
             this.Resource = resource;
+            this.DetalizationLevel = detalizationLevel;
 
             ulong version = 0;
-            State = repo.GetLastSnapshot<TState>(resource, out version);
-            this.Version = version;
+            State = repo.GetLastSnapshot<TState>(Resource, detalizationLevel, out version);
 
-            var mutations = repo.GetEvents(resource, Version).OrderBy(e => e.BaseVersion);
+            var mutations = repo.GetEvents(Resource, detalizationLevel, version).OrderBy(e => e.BaseVersion);
             ulong mutationsCount = 0;
             foreach(var mutation in mutations)
             {
                 Apply(mutation);
                 mutationsCount++;
             }
+            Version = repo.GetVersion(Resource);
 
-            if(mutationsCount > AggregateInfo.SnapshotInterval)
+            if (mutationsCount > AggregateInfo.GetSnapshotInterval(detalizationLevel))
             {
                 var state = State;
                 version = Version;
-                Task.Run(() => repo.PushSnapshot(Resource, state, version));
+                Task.Run(() => repo.PushSnapshot(Resource, state, detalizationLevel, version));
             }
         }
 
         public void Apply(MutationEvent mutation)
         {
-            if(Version != mutation.BaseVersion)
+            if(AggregateInfo == null)
+            {
+                throw new Exception("Агрегат не загружен");
+            }
+
+            if(mutation.DetalizationLevel > DetalizationLevel)
+            {
+                throw new ArgumentException("Попытка применить событие с более высокой степенью детализации");
+            }
+
+            if(mutation.BaseVersion < Version)
             {
                 throw new VersionConsistencyException(Resource, mutation, Version);
             }
             State = ((dynamic)this).Apply(State, (dynamic)mutation);
-            Version++;
+            Version = mutation.BaseVersion + 1;
         }
 
         public void Mutate(MutationEvent mutation)

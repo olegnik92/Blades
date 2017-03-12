@@ -25,7 +25,7 @@ namespace BladesStartUp.Domain.UsersList
             TypeDescription = ResourceTypeDescription
         };
 
-        public UsersListAr(IEsRepository repo) : base(repo, UsersListResource)
+        public UsersListAr(IEsRepository repo) : base(repo, UsersListResource, 0)
         {
         }
 

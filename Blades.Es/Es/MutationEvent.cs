@@ -12,6 +12,8 @@ namespace Blades.Es
 
         public ulong BaseVersion { get; set; }
 
+        public byte DetalizationLevel { get; set; }
+
         public override string ToString()
         {
             return $"Cобытие {Id} (для версии: {BaseVersion})";
