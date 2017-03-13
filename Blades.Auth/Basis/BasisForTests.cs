@@ -18,6 +18,21 @@ namespace Blades.Auth.Basis
             return user.Login.ToLower() == "admin";
         }
 
+        public bool HasRequirement(UserInfo user, PermissionType permission, Guid resourceTypeId)
+        {
+            return user.Login.ToLower() == "admin";
+        }
+
+        public bool HasRequirement(UserInfo user, PermissionType permission, Resource resource)
+        {
+            return user.Login.ToLower() == "admin";
+        }
+
+        public bool HasRequirement(UserInfo user, PermissionType permission, Guid resourceTypeId, Guid resourceInstanceId)
+        {
+            return user.Login.ToLower() == "admin";
+        }
+
         public bool TryAuthenticateUser(string login, string password, out ClaimsPrincipal principal)
         {
             login = login.Trim().ToLower();

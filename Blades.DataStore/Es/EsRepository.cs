@@ -121,7 +121,7 @@ namespace Blades.DataStore.Es
         }
 
 
-        private object locker = new object();
+        private static object locker = new object();
         public void Commit()
         {
             if(unsavedEvents == null)
