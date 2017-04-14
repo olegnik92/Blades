@@ -8,6 +8,6 @@ namespace Blades.DataStore.Interfaces
 {
     public interface ITransactRepositoryFactory
     {
-        TRepo GetRepository<TRepo>() where TRepo : ITransactRepository;
+        TRepo GetRepository<TRepo>(Guid transactionId) where TRepo : ITransactRepository;
     }
 }

@@ -4,8 +4,7 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>Nikishin Oleg</authors>
-    <owners>Nikishin Oleg</owners>
+    <authors>$author$</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes></releaseNotes>

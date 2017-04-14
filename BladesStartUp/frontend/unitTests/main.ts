@@ -1,8 +1,8 @@
-﻿import { JsonOperation } from 'blades-web/webApi/serverOperations';
-import { RequestExecutionError } from 'blades-web/webApi/requestExecutionError';
+﻿import { JsonOperation } from 'blades/webApi/serverOperations';
+import { RequestExecutionError } from 'blades/webApi/requestExecutionError';
 import { Promise } from 'es6-promise';
-import { connection } from 'blades-web/webApi/serverConnection';
-import { auth } from 'blades-web/webApi/auth';
+import { connection } from 'blades/webApi/serverConnection';
+import { auth } from 'blades/webApi/auth';
 const css = require<any>('./test.css');
 
 

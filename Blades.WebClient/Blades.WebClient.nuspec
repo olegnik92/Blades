@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Blades.WebClient</id>
-    <version>1.0.0</version>
-    <title>Blades.WebClient</title>
-    <authors>Nikishin Oleg</authors>
-    <owners>Nikishin Oleg</owners>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Blades library. Core typescript tools for Blades backend and browser API.</description>
     <releaseNotes></releaseNotes>
@@ -13,6 +12,6 @@
   </metadata>
 
   <files>
-    <file src="BladesWeb\" target="content\frontend\node_modules\blades" />
+    <file src="node_modules\blades\" target="content\node_modules\blades" />
   </files>
 </package>

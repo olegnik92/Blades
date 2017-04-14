@@ -152,8 +152,6 @@
     <Compile Include="Domain\UsersList\ChangeUserEvent.cs" />
     <Compile Include="Domain\UsersList\UsersListAr.cs" />
     <Compile Include="Domain\UsersList\UsersListState.cs" />
-    <Compile Include="Operations\CommandOperation.cs" />
-    <Compile Include="Operations\SaveUser.cs" />
     <Compile Include="Domain\ResourceTypePermission.cs" />
     <Compile Include="Domain\Role\CreateEvent.cs" />
     <Compile Include="Domain\Role\ResourcePermissionsMutationEvent.cs" />
@@ -165,8 +163,6 @@
     <Compile Include="Domain\User\UserAr.cs" />
     <Compile Include="Domain\User\UserState.cs" />
     <Compile Include="OperationController.cs" />
-    <Compile Include="Operations\TestEntityOperations.cs" />
-    <Compile Include="Operations\TransactOperation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -175,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Nuget_pack_all.cmd" />
     <None Include="package.json" />
     <None Include="packages.config" />
     <None Include="tsconfig.json" />

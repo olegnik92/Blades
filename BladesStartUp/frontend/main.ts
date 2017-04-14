@@ -1,6 +1,6 @@
-﻿import { connection } from 'blades-web/webApi/serverConnection';
-import { auth } from 'blades-web/webApi/auth';
-import { JsonOperation } from 'blades-web/webApi/serverOperations';
+﻿import { connection } from 'blades/webApi/serverConnection';
+import { auth } from 'blades/webApi/auth';
+import { JsonOperation } from 'blades/webApi/serverOperations';
 debugger;
 
 

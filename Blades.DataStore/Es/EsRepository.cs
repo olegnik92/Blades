@@ -8,18 +8,41 @@ using Blades.Es;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Blades.DataStore.Interfaces;
+using System.Collections.Concurrent;
 
 namespace Blades.DataStore.Es
 {
     public class EsRepository : IEsRepository, ITransactRepository
     {
+        public const byte MaxDetalizationLevel = 250;
 
-        private List<MutationEventStoreItem> unsavedEvents;
+        public Guid TransactionId { get { return transactionId; } }
+        private ConcurrentBag<MutationEventStoreItem> unsavedEvents;
 
         private IMongoDatabase db;
+        private Guid transactionId;
+        private Action<EsRepository> onCommit;
+
+        //Create for write
+        //should create only with Transact Repo factory
+        internal EsRepository(IMongoDatabase db, Guid transactionId, Action<EsRepository> onCommit)
+        {
+            if (Guid.Empty.Equals(transactionId))
+            {
+                throw new ArgumentException("transactionId should not be empty");
+            }
+
+            this.db = db;
+            this.transactionId = transactionId;
+            this.onCommit = onCommit;
+            this.unsavedEvents = new ConcurrentBag<MutationEventStoreItem>();
+        }
+
+        //Create for read
         public EsRepository(IMongoDatabase db)
         {
             this.db = db;
+            this.transactionId = Guid.Empty;
         }
 
         private IMongoCollection<MutationEventStoreItem> GetEventsCollection(Guid resourceTypeId)
@@ -32,17 +55,6 @@ namespace Blades.DataStore.Es
             return db.GetCollection<AggregateStateStoreItem<TState>>($"Snapshots_{resourceTypeId}_{detalizationLevel}");
         }
 
-        public List<MutationEvent> GetEvents(Resource resource, ulong startVersion)
-        {
-            var result = GetEventsCollection(resource.TypeId).AsQueryable()
-                .Where(item => item.ResourceInstanceId == resource.InstanceId)
-                .Where(item => item.MutationEvent.BaseVersion >= startVersion)
-                .OrderBy(item => item.MutationEvent.BaseVersion)
-                .Select(item => item.MutationEvent);
-
-            return result.ToList();
-        }
-
         public List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, ulong startVersion)
         {
             var result = GetEventsCollection(resource.TypeId).AsQueryable()
@@ -52,7 +64,16 @@ namespace Blades.DataStore.Es
                 .OrderBy(item => item.MutationEvent.BaseVersion)
                 .Select(item => item.MutationEvent);
 
-            return result.ToList();
+            var events = result.ToList();
+            events.AddRange(unsavedEvents
+                .OrderBy(e => e.MutationEvent.BaseVersion)
+                .Select(e => e.MutationEvent));
+            return events;
+        }
+
+        public List<MutationEvent> GetEvents(Resource resource, ulong startVersion)
+        {
+            return GetEvents(resource, MaxDetalizationLevel, startVersion);
         }
 
         public TState GetLastSnapshot<TState>(Resource resource, byte detalizationLevel, out ulong version)
@@ -87,6 +108,11 @@ namespace Blades.DataStore.Es
 
         public void PushEvent(Resource resource, MutationEvent mutation)
         {
+            if (Guid.Empty.Equals(transactionId))
+            {
+                throw new Exception("Es repositore was created without transaction Id, so it can not be used for mutations");
+            }
+
             if(mutation.Id == Guid.Empty)
             {
                 mutation.Id = Guid.NewGuid();
@@ -96,19 +122,21 @@ namespace Blades.DataStore.Es
             {
                 ResourceTypeId = resource.TypeId,
                 ResourceInstanceId = resource.InstanceId,
+                TransactionId = transactionId,
                 MutationEvent = mutation
             };
 
-            if(unsavedEvents == null)
-            {
-                unsavedEvents = new List<MutationEventStoreItem>();
-            }
             unsavedEvents.Add(storeItem);
         }
 
 
         public void PushSnapshot<TState>(Resource resource, TState state, byte detalizationLevel, ulong version)
         {
+            if (!Guid.Empty.Equals(transactionId))
+            {
+                return; //Add snapshots only for readable only repositiory, because of possible unsaved events otherwise
+            }
+
             var storeItem = new AggregateStateStoreItem<TState>()
             {
                 ResourceTypeId = resource.TypeId,
@@ -124,7 +152,7 @@ namespace Blades.DataStore.Es
         private static object locker = new object();
         public void Commit()
         {
-            if(unsavedEvents == null)
+            if (Guid.Empty.Equals(transactionId))
             {
                 return;
             }
@@ -147,7 +175,7 @@ namespace Blades.DataStore.Es
                 }
             }
 
-            unsavedEvents = null;
+            onCommit(this);
         }
 
 
