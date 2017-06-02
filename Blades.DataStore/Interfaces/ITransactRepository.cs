@@ -9,6 +9,7 @@ namespace Blades.DataStore.Interfaces
 {
     public interface ITransactRepository
     {
+        Guid TransactionId { get; }
         void Commit();
     }
 }

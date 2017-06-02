@@ -1,4 +1,5 @@
 ﻿using Blades.Core;
+using Blades.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Blades.Es.Interfaces
 {
-    public interface IEsRepository
+    public interface IEsRepository: IBladesService
     {
         TState GetLastSnapshot<TState>(Resource resource, byte detalizationLevel, out ulong version);
 

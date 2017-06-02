@@ -63,7 +63,7 @@ namespace BladesStartUp
 
             container.Register(Component.For<IMongoDatabase>().Instance(db));
             container.Register(Component.For<Blades.DataStore.Interfaces.ITransactRepositoryFactory>().ImplementedBy<Blades.DataStore.Basis.TransactRepositoryFactory>());
-            container.Register(Component.For<Blades.DataStore.Es.EsRepository>().ImplementedBy<Blades.DataStore.Es.EsRepository>());
+            container.Register(Component.For<Blades.DataStore.Basis.Es.EsRepository>().ImplementedBy<Blades.DataStore.Basis.Es.EsRepository>());
         }
 
         private void RegisterOperationTypes(IWindsorContainer container)

@@ -2,25 +2,25 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// Общие сведения об этой сборке предоставляются следующим набором 
-// атрибутов. Отредактируйте значения этих атрибутов, чтобы изменить
-// общие сведения об этой сборке.
-[assembly: AssemblyTitle("Blades.WebClient.Properties")]
+// Управление общими сведениями о сборке осуществляется с помощью 
+// набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
+// связанные со сборкой.
+[assembly: AssemblyTitle("Blades.WebClient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Nikishin Oleg")]
-[assembly: AssemblyProduct("Blades.WebClient.Properties")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Blades.WebClient")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Установка значения False в параметре ComVisible делает типы в этой сборке невидимыми 
-// для COM-компонентов.  Если необходим доступ к типу в этой сборке из 
-// COM, следует установить атрибут ComVisible в TRUE для этого типа.
+// Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
+// для COM-компонентов.  Если требуется обратиться к типу в этой сборке через 
+// COM, задайте атрибуту ComVisible значение TRUE для этого типа.
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("5a2a7c10-843d-4146-a472-5ca669dc322a")]
+[assembly: Guid("9916d2ba-12ce-4ca5-b3d8-d69981f506f2")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
@@ -29,5 +29,8 @@ using System.Runtime.InteropServices;
 //   Номер сборки
 //      Редакция
 //
-[assembly: AssemblyVersion("1.0.*")]
+// Можно задать все значения или принять номера сборки и редакции по умолчанию 
+// используя "*", как показано ниже:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

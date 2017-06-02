@@ -45,7 +45,7 @@ namespace BladesStartUp
 
         public void FileServerConfig(IAppBuilder appBuilder)
         {
-            var physicalFileSystem = new PhysicalFileSystem(@".\public");
+            var physicalFileSystem = new PhysicalFileSystem(@"./public");
             var options = new FileServerOptions
             {
                 EnableDefaultFiles = true,

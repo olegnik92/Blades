@@ -139,34 +139,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\Commands\TestCommand.cs" />
-    <Compile Include="Domain\RoleBase.cs" />
-    <Compile Include="Domain\TestEntity\AlterNumEvent.cs" />
-    <Compile Include="Domain\TestEntity\ChangeEvent.cs" />
-    <Compile Include="Domain\TestEntity\CreateEvent.cs" />
-    <Compile Include="Domain\TestEntity\TestEntityAr.cs" />
-    <Compile Include="Domain\TestEntity\TestEntityCommandsReceiver.cs" />
-    <Compile Include="Domain\TestEntity\TestEntityState.cs" />
-    <Compile Include="Domain\UserBase.cs" />
-    <Compile Include="Domain\UsersList\AddUserEvent.cs" />
-    <Compile Include="Domain\UsersList\ChangeUserEvent.cs" />
-    <Compile Include="Domain\UsersList\UsersListAr.cs" />
-    <Compile Include="Domain\UsersList\UsersListState.cs" />
-    <Compile Include="Domain\ResourceTypePermission.cs" />
-    <Compile Include="Domain\Role\CreateEvent.cs" />
-    <Compile Include="Domain\Role\ResourcePermissionsMutationEvent.cs" />
-    <Compile Include="Domain\Role\RoleAr.cs" />
-    <Compile Include="Domain\Role\RoleState.cs" />
-    <Compile Include="Domain\User\ChangeEvent.cs" />
-    <Compile Include="Domain\User\CreateEvent.cs" />
-    <Compile Include="Domain\User\ResourcePermissionsMutationEvent.cs" />
-    <Compile Include="Domain\User\UserAr.cs" />
-    <Compile Include="Domain\User\UserState.cs" />
-    <Compile Include="OperationController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Operations\TestOperations.cs" />
     <Compile Include="WindsorActivator.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -197,25 +172,30 @@
       <Project>{9136ac2a-607e-459b-883c-e4bd7d3e3775}</Project>
       <Name>Blades.Es</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Blades.WebClient\Blades.WebClient.csproj">
+      <Project>{9916d2ba-12ce-4ca5-b3d8-d69981f506f2}</Project>
+      <Name>Blades.WebClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Blades.Web\Blades.Web.csproj">
       <Project>{fc0e8f0b-d116-4add-8e7b-f531af8f7727}</Project>
       <Name>Blades.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="frontend\unitTests\test.css" />
-    <Content Include="public\index.html" />
-    <Content Include="public\jasmine\index.html" />
+    <Content Include="public\unitTests\boot.js" />
+    <Content Include="public\unitTests\index.html" />
+    <Content Include="public\unitTests\jasmine-html.js" />
+    <Content Include="public\unitTests\jasmine.css" />
+    <Content Include="public\unitTests\jasmine.js" />
+    <Content Include="public\unitTests\jasmine_favicon.png" />
+    <Content Include="public\unitTests\json2.js" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Dto\" />
+    <TypeScriptCompile Include="clientModules\startup\app.ts" />
+    <TypeScriptCompile Include="clientModules\startup\unitTests.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="frontend\%40types\require.d.ts" />
-    <TypeScriptCompile Include="frontend\main.ts" />
-    <TypeScriptCompile Include="frontend\unitTests\main.ts" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

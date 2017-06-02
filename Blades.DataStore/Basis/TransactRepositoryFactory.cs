@@ -25,6 +25,11 @@ namespace Blades.DataStore.Basis
         {
             if (typeof(TRepo).IsAssignableFrom(typeof(Es.EsRepository)))
             {
+                if (Guid.Empty.Equals(transactionId))
+                {
+                    return (TRepo)(object)(new Es.EsRepository(db));
+                }
+
                 var repo = esRepositories.GetOrAdd(transactionId, CreateEsRepository);
                 var result = (TRepo)(object)(repo);
                 return result;

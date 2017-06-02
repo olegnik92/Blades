@@ -10,8 +10,8 @@ namespace Blades.Commands.Interfaces
 {
     public interface ICommandEmitter : IBladesService
     {
-        void Execute(Command command, UserInfo user);
+        void Execute(Command command);
 
-        Task Emit(Command command, UserInfo user);
+        Task Emit(Command command);
     }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "blades",
+  "version": "1.0.0",
+  "description": "Blades library. Core typescript tools for Blades backend and browser API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "NOY",
+  "license": "ISC",
+  "dependencies": {
+    "@types/es6-promise": "0.0.32",
+    "es6-promise": "^4.0.5"
+  }
+}

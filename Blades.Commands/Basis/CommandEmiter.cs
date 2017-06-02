@@ -33,9 +33,13 @@ namespace Blades.Commands.Basis
             }
         }
 
-        public Task Emit(Command command, UserInfo user)
+        public Task Emit(Command command)
         {
-            command.Init(user);
+            if (IsNotInit(command))
+            {
+                throw new ArgumentException("Command is not init");
+            }
+
             return Task.Run(() =>
             {
                 var receivers = receiversMap[command.GetType().FullName];
@@ -50,14 +54,24 @@ namespace Blades.Commands.Basis
             });
         }
 
-        public void Execute(Command command, UserInfo user)
+        public void Execute(Command command)
         {
-            command.Init(user);
+            if (IsNotInit(command))
+            {
+                throw new ArgumentException("Command is not init");
+            }
+
             foreach (var receiver in receiversMap[command.GetType().FullName])
             {
                 var report = ExecuteCommand(command, receiver);
                 command.ExecutionReports.Add(report);
             }
+        }
+
+
+        private bool IsNotInit(Command command)
+        {
+            return Guid.Empty.Equals(command.Id) || command.User == null;
         }
 
         private static OperationExecutionReport ExecuteCommand(Command command, ICommandReceiver receiver)
