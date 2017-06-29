@@ -4,7 +4,7 @@ import { Promise } from 'es6-promise';
 import json from '../tools/json';
 
 
-export abstract class BaseOperation {
+abstract class BaseOperation {
 
     protected name: string;
 
@@ -32,6 +32,8 @@ export abstract class BaseOperation {
     }
 }
 
+
+export default BaseOperation;
 
 export class JsonOperation extends BaseOperation {
 

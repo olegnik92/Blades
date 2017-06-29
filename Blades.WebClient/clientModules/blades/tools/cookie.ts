@@ -7,7 +7,7 @@ export class CookieOptions {
         this.path = '/';
     }
 
-    public expires: number | Date; //number - число секунд  до истичения срока, Date - дата истичения срока
+    public expires: number | Date; //number - число милисекунд  до истичения срока, Date - дата истичения срока
     public path: string;
     public domain: string;
     public secure: boolean;
@@ -31,7 +31,7 @@ export class CookieApi {
 
         if (typeof expires == "number" && expires) {//for number
             let d = new Date();
-            d.setTime(d.getTime() + expires * 1000);
+            d.setTime(d.getTime() + expires);
             expires = options.expires = d;
         }
         if (expires && expires.toUTCString) { //for date

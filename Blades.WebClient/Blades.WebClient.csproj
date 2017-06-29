@@ -64,6 +64,9 @@
     <Content Include="clientModules\jasmine\json2.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="clientModules\blades\storages\browserStorage.ts" />
+    <TypeScriptCompile Include="clientModules\blades\storages\cookieStorage.ts" />
+    <TypeScriptCompile Include="clientModules\blades\storages\tempStorage.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\cookie.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\json.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\noop.ts" />
@@ -78,6 +81,7 @@
     <TypeScriptCompile Include="clientModules\%40types\jasmine\index.d.ts" />
     <TypeScriptCompile Include="clientModules\jasmine\ownTest.ts" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
