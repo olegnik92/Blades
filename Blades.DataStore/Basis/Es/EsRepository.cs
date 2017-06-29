@@ -14,8 +14,6 @@ namespace Blades.DataStore.Basis.Es
 {
     public class EsRepository : IEsRepository, ITransactRepository
     {
-        public const byte MaxDetalizationLevel = 250;
-
         public Guid TransactionId { get { return transactionId; } }
         private ConcurrentBag<MutationEventStoreItem> unsavedEvents;
 
@@ -50,52 +48,47 @@ namespace Blades.DataStore.Basis.Es
             return db.GetCollection<MutationEventStoreItem>($"MutationEvents_{resourceTypeId}");
         }
 
-        private IMongoCollection<AggregateStateStoreItem<TState>> GetSnapshotsCollection<TState>(Guid resourceTypeId, byte detalizationLevel)
+        private IMongoCollection<AggregateStateStoreItem<TState>> GetSnapshotsCollection<TState>(Guid resourceTypeId)
         {
-            return db.GetCollection<AggregateStateStoreItem<TState>>($"Snapshots_{resourceTypeId}_{detalizationLevel}");
+            return db.GetCollection<AggregateStateStoreItem<TState>>($"Snapshots_{resourceTypeId}");
         }
 
-        public List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, ulong startVersion)
+        public List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, List<ulong> startVersions)
         {
             var result = GetEventsCollection(resource.TypeId).AsQueryable()
                 .Where(item => item.ResourceInstanceId == resource.InstanceId)
                 .Where(item => item.MutationEvent.DetalizationLevel <= detalizationLevel)
-                .Where(item => item.MutationEvent.BaseVersion >= startVersion)
+                .Where(item => item.MutationEvent.BaseVersion >= startVersions[item.MutationEvent.DetalizationLevel])
                 .OrderBy(item => item.MutationEvent.BaseVersion)
                 .Select(item => item.MutationEvent);
 
             var events = result.ToList();
             events.AddRange(unsavedEvents
-                .OrderBy(e => e.MutationEvent.BaseVersion)
-                .Select(e => e.MutationEvent));
+                .Where(e => e.ResourceTypeId == resource.TypeId && e.ResourceInstanceId == resource.InstanceId)
+                .Select(e => e.MutationEvent)
+                .Where(e => e.DetalizationLevel <= detalizationLevel)
+                .Where(e => e.BaseVersion >= startVersions[e.DetalizationLevel])
+                .OrderBy(e => e.BaseVersion));
+
             return events;
         }
 
-        public List<MutationEvent> GetEvents(Resource resource, ulong startVersion)
-        {
-            return GetEvents(resource, MaxDetalizationLevel, startVersion);
-        }
 
-        public TState GetLastSnapshot<TState>(Resource resource, byte detalizationLevel, out ulong version)
+        public TState GetLastSnapshot<TState>(Resource resource, out List<ulong> versions)
         {
-            var snapshots = GetSnapshotsCollection<TState>(resource.TypeId, detalizationLevel).AsQueryable()
+            var snapshots = GetSnapshotsCollection<TState>(resource.TypeId).AsQueryable()
                 .Where(item => item.ResourceInstanceId == resource.InstanceId);
 
-            var ver = snapshots.Any() ? snapshots.Max(s => s.Version) : 0;
-            var lastSnapshot = snapshots.FirstOrDefault(snapshot => snapshot.Version == ver);
+            var lastSnapshot = snapshots.FirstOrDefault(snapshot => snapshot.SaveTime == snapshots.Max(s => s.SaveTime));
 
-            version = ver;
-            return lastSnapshot == null ? default(TState): lastSnapshot.AggregateState;
-        }
+            if (lastSnapshot == null)
+            {
+                versions = new List<ulong>();
+                return default(TState);
+            }
 
-        public ulong GetVersion(Resource resource)
-        {
-            var maxBaseVer = GetEventsCollection(resource.TypeId).AsQueryable()
-                .Where(item => item.ResourceTypeId == resource.TypeId)
-                .Where(item => item.ResourceInstanceId == resource.InstanceId)
-                .Max(item => item.MutationEvent.BaseVersion);
-
-            return maxBaseVer + 1;
+            versions = lastSnapshot.Versions;
+            return lastSnapshot.AggregateState;
         }
 
 
@@ -130,7 +123,7 @@ namespace Blades.DataStore.Basis.Es
         }
 
 
-        public void PushSnapshot<TState>(Resource resource, TState state, byte detalizationLevel, ulong version)
+        public void PushSnapshot<TState>(Resource resource, TState state, List<ulong> versions)
         {
             if (!Guid.Empty.Equals(transactionId))
             {
@@ -142,10 +135,10 @@ namespace Blades.DataStore.Basis.Es
                 ResourceTypeId = resource.TypeId,
                 ResourceInstanceId = resource.InstanceId,
                 AggregateState = state,
-                Version = version
+                Versions = versions
             };
 
-            GetSnapshotsCollection<TState>(resource.TypeId, detalizationLevel).InsertOne(storeItem);
+            GetSnapshotsCollection<TState>(resource.TypeId).InsertOne(storeItem);
         }
 
 
@@ -166,11 +159,6 @@ namespace Blades.DataStore.Basis.Es
                 {
                     var firstEvent = instanceEventsChain.First();
                     var resource = new Resource() { TypeId = firstEvent.ResourceTypeId, InstanceId = firstEvent.ResourceInstanceId };
-                    var version = GetVersion(resource);
-                    if(version != firstEvent.MutationEvent.BaseVersion)
-                    {
-                        throw new VersionConsistencyException(resource, firstEvent.MutationEvent, version);
-                    }
                     GetEventsCollection(firstEvent.ResourceTypeId).InsertMany(instanceEventsChain);
                 }
             }

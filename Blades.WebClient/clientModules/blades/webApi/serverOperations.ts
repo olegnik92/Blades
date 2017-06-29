@@ -33,7 +33,7 @@ export abstract class BaseOperation {
 }
 
 
-export default class JsonOperation extends BaseOperation {
+export class JsonOperation extends BaseOperation {
 
     public constructor(name: string, data: Object) {
         let strData = json.stringify(data);

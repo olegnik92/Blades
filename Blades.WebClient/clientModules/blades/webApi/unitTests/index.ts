@@ -1,5 +1,5 @@
 ﻿
-import JsonOperation from '../serverOperations';
+import { JsonOperation } from '../serverOperations';
 import RequestExecutionError from '../requestExecutionError';
 import { Promise } from 'es6-promise';
 import connection from '../serverConnection';

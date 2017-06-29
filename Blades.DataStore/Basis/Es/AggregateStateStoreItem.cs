@@ -14,7 +14,7 @@ namespace Blades.DataStore.Basis.Es
         public Guid ResourceTypeId { get; set; }
         public Guid ResourceInstanceId { get; set; }
         public TState AggregateState { get; set; }
-        public ulong Version { get; set; }
+        public List<ulong> Versions { get; set; }
         public DateTime SaveTime { get; set; } = DateTime.Now;
     }
 }

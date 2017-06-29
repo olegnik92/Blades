@@ -10,15 +10,13 @@ namespace Blades.Es.Interfaces
 {
     public interface IEsRepository: IBladesService
     {
-        TState GetLastSnapshot<TState>(Resource resource, byte detalizationLevel, out ulong version);
+        TState GetLastSnapshot<TState>(Resource resource, out List<ulong> versions);
 
-        List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, ulong startVersion);
-
-        ulong GetVersion(Resource resource);
+        List<MutationEvent> GetEvents(Resource resource, byte detalizationLevel, List<ulong> startVersions);
 
         List<Guid> GetAllInstanceIds(Guid resourceTypeId);
 
-        void PushSnapshot<TState>(Resource resource, TState state, byte detalizationLevel, ulong version);
+        void PushSnapshot<TState>(Resource resource, TState state, List<ulong> versions);
 
         void PushEvent(Resource resource, MutationEvent mutation);
     }

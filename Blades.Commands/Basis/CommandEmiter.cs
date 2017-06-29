@@ -12,8 +12,10 @@ namespace Blades.Commands.Basis
     public class CommandEmiter : ICommandEmitter
     {
         private Dictionary<string, List<ICommandReceiver>> receiversMap;
-        public CommandEmiter(ICommandReceiverActivator activator)
+        private ICommandsHistory history;
+        public CommandEmiter(ICommandReceiverActivator activator, ICommandsHistory history)
         {
+            this.history = history;
             var allTypes = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a => a.GetTypes())
                     .Where(t => !t.IsAbstract).ToList();
@@ -51,6 +53,7 @@ namespace Blades.Commands.Basis
                 }));
 
                 command.ExecutionReports.AddRange(reports);
+                history.Put(command);
             });
         }
 
@@ -66,6 +69,7 @@ namespace Blades.Commands.Basis
                 var report = ExecuteCommand(command, receiver);
                 command.ExecutionReports.Add(report);
             }
+            history.Put(command);
         }
 
 
