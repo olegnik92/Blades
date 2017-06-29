@@ -35,3 +35,4 @@ export class CookieStorage implements ITempStorage {
 
 
 const cookieStorage = new CookieStorage();
+export default cookieStorage;

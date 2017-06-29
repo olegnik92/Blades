@@ -67,10 +67,12 @@
     <TypeScriptCompile Include="clientModules\blades\storages\browserStorage.ts" />
     <TypeScriptCompile Include="clientModules\blades\storages\cookieStorage.ts" />
     <TypeScriptCompile Include="clientModules\blades\storages\tempStorage.ts" />
+    <TypeScriptCompile Include="clientModules\blades\storages\unitTests\index.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\cookie.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\json.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\noop.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\storageTabsCommunicator.ts" />
+    <TypeScriptCompile Include="clientModules\blades\unitTests\index.ts" />
     <TypeScriptCompile Include="clientModules\blades\webApi\auth.ts" />
     <TypeScriptCompile Include="clientModules\blades\webApi\requestExecutionError.ts" />
     <TypeScriptCompile Include="clientModules\blades\webApi\serverConnection.ts" />

@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -272,7 +272,7 @@ exports.default = connection;
 Object.defineProperty(exports, "__esModule", { value: true });
 var es6_promise_1 = __webpack_require__(6);
 var json_1 = __webpack_require__(0);
-var RequestExecutionError_1 = __webpack_require__(8);
+var RequestExecutionError_1 = __webpack_require__(10);
 var Xhr = (function () {
     function Xhr(url, method, body) {
         if (method === void 0) { method = 'GET'; }
@@ -388,186 +388,8 @@ exports.default = Xhr;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var serverOperations_1 = __webpack_require__(10);
-var serverConnection_1 = __webpack_require__(2);
-var auth_1 = __webpack_require__(9);
-var Tuple = (function () {
-    function Tuple() {
-    }
-    return Tuple;
-}());
-var ComplexDataType = (function () {
-    function ComplexDataType() {
-    }
-    return ComplexDataType;
-}());
-describe('Xhr tests', function () {
-    beforeEach(function () {
-        auth_1.default.clearTokenInfo();
-    });
-    it('TestOperation.EchoOperation', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.EchoOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(5);
-            done();
-        }).catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.ComplexDataOperation', function (done) {
-        var data = new ComplexDataType();
-        data.someInt = -3;
-        data.someString = 'Тестовая строка';
-        data.someBool = false;
-        data.time = new Date();
-        data.listData = [{ item1: 5, item2: 'Abc', item3: true }, { item1: -5, item2: 'abC', item3: false }];
-        new serverOperations_1.default('TestOperation.ComplexDataOperation', data).execute()
-            .then(function (result) {
-            expect(typeof (result.someInt)).toBe('number');
-            expect(result.someInt).toBe(-6);
-            expect(result.someString).toBe('ТЕСТОВАЯ СТРОКА');
-            expect(typeof (result.someBool)).toBe('boolean');
-            expect(result.someBool).toBe(true);
-            expect(typeof (result.time)).toBe('object');
-            expect(result.time.getHours()).toBe(data.time.getHours());
-            expect(result.time.getFullYear()).toBe(data.time.getFullYear() + 1);
-            expect(result.listData.length).toBe(2);
-            expect(result.listData[0].item1).toBe(4);
-            expect(result.listData[1].item2).toBe('abc');
-            done();
-        })
-            .catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation 0', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.FailedOperation', 0);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation > 0', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.FailedOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(500);
-            expect(err.message).toBe('Data > 0');
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation < 0', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.FailedOperation', -5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(500);
-            expect(err.message).toBe('Data < 0');
-            done();
-        });
-    });
-    it('Login password good info test', function (done) {
-        auth_1.default.authorize('admin', 'w')
-            .then(function (data) {
-            expect(data.login).toBe('admin');
-            done();
-        })
-            .catch(function (err) {
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('Login password bad info test', function (done) {
-        auth_1.default.authorize('admin', 'p')
-            .then(function (data) {
-            expect('').toBe('Попытка должна провалиться');
-            done();
-        })
-            .catch(function (err) {
-            expect(err.status).toBe(400);
-            expect(err.message).toBe("Неверный логин или пароль");
-            done();
-        });
-    });
-    it('TestOperation.AuthFailedOperation Bad scenario', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.AuthFailedOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe('Попытка должна провалиться');
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(401);
-            expect(err.message).toBe('Пользователь не авторизован');
-            done();
-        });
-    });
-    it('TestOperation.AuthFailedOperation Good scenario', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.AuthFailedOperation', 7);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe(7);
-                done();
-            }).catch(function (err) {
-                expect(false).toBeTruthy();
-                done();
-            });
-        });
-    });
-    it('TestOperation.PermissionedFailedOperation Bad scenario', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.PermissionedFailedOperation', 7);
-        auth_1.default.authorize('someUser', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe('Попытка должна провалиться');
-                done();
-            }).catch(function (err) {
-                expect(err.status).toBe(403);
-                expect(err.message).toBe("Пользователь someuser не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
-                done();
-            });
-        });
-    });
-    it('TestOperation.PermissionedFailedOperation Good scenario', function (done) {
-        var operation = new serverOperations_1.default('TestOperation.PermissionedFailedOperation', 7);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe(7);
-                done();
-            }).catch(function (err) {
-                expect(false).toBeTruthy();
-                done();
-            });
-        });
-    });
-});
-describe('Web socket connection Tests', function () {
-    it('TestOperation.WebSocketOperation; test 1', function (done) {
-        var data = new Tuple();
-        data.item1 = 4;
-        data.item2 = 'TesT';
-        data.item3 = new Date();
-        var operation = new serverOperations_1.default('TestOperation.WebSocketOperation', data);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            serverConnection_1.default.open();
-            operation.executeViaConnection();
-        });
-        serverConnection_1.default.onNotifyMessage('TestWsOp', function (newData) {
-            expect(newData.item1).toBe(8);
-            expect(newData.item2).toBe('test');
-            expect(newData.item3.getFullYear()).toBe(data.item3.getFullYear() + 5);
-            done();
-        });
-    });
-});
+__webpack_require__(8);
+__webpack_require__(14);
 
 
 /***/ }),
@@ -726,7 +548,7 @@ function flush() {
 function attemptVertx() {
   try {
     var r = require;
-    var vertx = __webpack_require__(16);
+    var vertx = __webpack_require__(19);
     vertxNext = vertx.runOnLoop || vertx.runOnContext;
     return useVertxTimer();
   } catch (e) {
@@ -1749,10 +1571,147 @@ return Promise;
 })));
 //# sourceMappingURL=es6-promise.map
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14), __webpack_require__(15)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17), __webpack_require__(18)))
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var json_1 = __webpack_require__(0);
+var deathTimeField = '__deathTime';
+var BrowserStorage = (function () {
+    function BrowserStorage(storage) {
+        this.storage = storage;
+    }
+    BrowserStorage.prototype.set = function (key, value, timeToLive) {
+        if (typeof value !== 'object') {
+            return;
+        }
+        var storeItem = __assign({}, value);
+        if (timeToLive) {
+            var deathTime = Date.now() + timeToLive;
+            storeItem[deathTimeField] = deathTime;
+        }
+        this.storage.setItem(key, json_1.default.stringify(storeItem));
+    };
+    BrowserStorage.prototype.get = function (key) {
+        var itemStr = this.storage.getItem(key);
+        if (!itemStr) {
+            return null;
+        }
+        var storeItem = json_1.default.parse(itemStr);
+        if (typeof storeItem !== 'object') {
+            return null;
+        }
+        if (storeItem[deathTimeField] < Date.now()) {
+            this.storage.removeItem(key);
+            return null;
+        }
+        return storeItem;
+    };
+    BrowserStorage.prototype.remove = function (key) {
+        this.storage.removeItem(key);
+    };
+    return BrowserStorage;
+}());
+;
+exports.default = BrowserStorage;
+var SessionStorage = (function (_super) {
+    __extends(SessionStorage, _super);
+    function SessionStorage() {
+        return _super.call(this, window.sessionStorage) || this;
+    }
+    return SessionStorage;
+}(BrowserStorage));
+exports.SessionStorage = SessionStorage;
+exports.sessionStorage = new SessionStorage();
+var LocalStorage = (function (_super) {
+    __extends(LocalStorage, _super);
+    function LocalStorage() {
+        return _super.call(this, window.localStorage) || this;
+    }
+    return LocalStorage;
+}(BrowserStorage));
+exports.LocalStorage = LocalStorage;
+exports.localStorage = new LocalStorage();
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var browserStorage_1 = __webpack_require__(7);
+var cookieStorage_1 = __webpack_require__(20);
+describe('Blades Temp storage tests', function () {
+    describe('Local storage test', function () {
+        testScript(browserStorage_1.localStorage);
+    });
+    describe('Session storage test', function () {
+        testScript(browserStorage_1.sessionStorage);
+    });
+    describe('Cookie storage test', function () {
+        testScript(cookieStorage_1.default);
+    });
+});
+function testScript(storage) {
+    it('Add item', function () {
+        var item = { a: 5 };
+        storage.set('item', item);
+        var savedItem = storage.get('item');
+        expect(savedItem['a']).toBe(5);
+    });
+    it('Add item with expired', function (done) {
+        var item = { a: 5 };
+        storage.set('item', item, 150);
+        setTimeout(function () {
+            var savedItem = storage.get('item');
+            expect(savedItem['a']).toBe(5);
+        }, 50);
+        setTimeout(function () {
+            var savedItem = storage.get('item');
+            expect(savedItem).toBeNull();
+            done();
+        }, 250);
+    });
+    it('Remove item', function () {
+        var item = { a: 6 };
+        storage.set('item', item);
+        var savedItem = storage.get('item');
+        expect(savedItem['a']).toBe(6);
+        storage.remove('item');
+        var savedItem2 = storage.get('item');
+        expect(savedItem2).toBeNull();
+    });
+}
+;
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1779,7 +1738,7 @@ var CookieApi = (function () {
         var expires = options.expires;
         if (typeof expires == "number" && expires) {
             var d = new Date();
-            d.setTime(d.getTime() + expires * 1000);
+            d.setTime(d.getTime() + expires);
             expires = options.expires = d;
         }
         if (expires && expires.toUTCString) {
@@ -1807,7 +1766,7 @@ exports.default = cookie;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1844,16 +1803,16 @@ exports.default = RequestExecutionError;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var tokenInfo_1 = __webpack_require__(11);
+var tokenInfo_1 = __webpack_require__(13);
 var xhr_1 = __webpack_require__(3);
 var noop_1 = __webpack_require__(1);
-var cookie_1 = __webpack_require__(7);
+var cookie_1 = __webpack_require__(9);
 var Auth = (function () {
     function Auth(accessTokenInfoStorageKey, accessTokenCookieName) {
         this.accessTokenPath = '/token';
@@ -1930,7 +1889,7 @@ exports.default = auth;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1965,7 +1924,7 @@ var BaseOperation = (function () {
     };
     return BaseOperation;
 }());
-exports.BaseOperation = BaseOperation;
+exports.default = BaseOperation;
 var JsonOperation = (function (_super) {
     __extends(JsonOperation, _super);
     function JsonOperation(name, data) {
@@ -1990,7 +1949,7 @@ var JsonOperation = (function (_super) {
     };
     return JsonOperation;
 }(BaseOperation));
-exports.default = JsonOperation;
+exports.JsonOperation = JsonOperation;
 var FormDataOperation = (function (_super) {
     __extends(FormDataOperation, _super);
     function FormDataOperation(name, data) {
@@ -2002,7 +1961,7 @@ exports.FormDataOperation = FormDataOperation;
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2032,8 +1991,197 @@ exports.default = TokenInfo;
 
 
 /***/ }),
-/* 12 */,
-/* 13 */
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var serverOperations_1 = __webpack_require__(12);
+var serverConnection_1 = __webpack_require__(2);
+var auth_1 = __webpack_require__(11);
+var Tuple = (function () {
+    function Tuple() {
+    }
+    return Tuple;
+}());
+var ComplexDataType = (function () {
+    function ComplexDataType() {
+    }
+    return ComplexDataType;
+}());
+describe('Xhr tests', function () {
+    beforeEach(function () {
+        auth_1.default.clearTokenInfo();
+    });
+    it('TestOperation.EchoOperation', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.EchoOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(5);
+            done();
+        }).catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.ComplexDataOperation', function (done) {
+        var data = new ComplexDataType();
+        data.someInt = -3;
+        data.someString = 'Тестовая строка';
+        data.someBool = false;
+        data.time = new Date();
+        data.listData = [{ item1: 5, item2: 'Abc', item3: true }, { item1: -5, item2: 'abC', item3: false }];
+        new serverOperations_1.JsonOperation('TestOperation.ComplexDataOperation', data).execute()
+            .then(function (result) {
+            expect(typeof (result.someInt)).toBe('number');
+            expect(result.someInt).toBe(-6);
+            expect(result.someString).toBe('ТЕСТОВАЯ СТРОКА');
+            expect(typeof (result.someBool)).toBe('boolean');
+            expect(result.someBool).toBe(true);
+            expect(typeof (result.time)).toBe('object');
+            expect(result.time.getHours()).toBe(data.time.getHours());
+            expect(result.time.getFullYear()).toBe(data.time.getFullYear() + 1);
+            expect(result.listData.length).toBe(2);
+            expect(result.listData[0].item1).toBe(4);
+            expect(result.listData[1].item2).toBe('abc');
+            done();
+        })
+            .catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 0);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation > 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(500);
+            expect(err.message).toBe('Data > 0');
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation < 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', -5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(500);
+            expect(err.message).toBe('Data < 0');
+            done();
+        });
+    });
+    it('Login password good info test', function (done) {
+        auth_1.default.authorize('admin', 'w')
+            .then(function (data) {
+            expect(data.login).toBe('admin');
+            done();
+        })
+            .catch(function (err) {
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('Login password bad info test', function (done) {
+        auth_1.default.authorize('admin', 'p')
+            .then(function (data) {
+            expect('').toBe('Попытка должна провалиться');
+            done();
+        })
+            .catch(function (err) {
+            expect(err.status).toBe(400);
+            expect(err.message).toBe("Неверный логин или пароль");
+            done();
+        });
+    });
+    it('TestOperation.AuthFailedOperation Bad scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe('Попытка должна провалиться');
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(401);
+            expect(err.message).toBe('Пользователь не авторизован');
+            done();
+        });
+    });
+    it('TestOperation.AuthFailedOperation Good scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 7);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe(7);
+                done();
+            }).catch(function (err) {
+                expect(false).toBeTruthy();
+                done();
+            });
+        });
+    });
+    it('TestOperation.PermissionedFailedOperation Bad scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
+        auth_1.default.authorize('someUser', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe('Попытка должна провалиться');
+                done();
+            }).catch(function (err) {
+                expect(err.status).toBe(403);
+                expect(err.message).toBe("Пользователь someuser не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
+                done();
+            });
+        });
+    });
+    it('TestOperation.PermissionedFailedOperation Good scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe(7);
+                done();
+            }).catch(function (err) {
+                expect(false).toBeTruthy();
+                done();
+            });
+        });
+    });
+});
+describe('Web socket connection Tests', function () {
+    it('TestOperation.WebSocketOperation; test 1', function (done) {
+        var data = new Tuple();
+        data.item1 = 4;
+        data.item2 = 'TesT';
+        data.item3 = new Date();
+        var operation = new serverOperations_1.JsonOperation('TestOperation.WebSocketOperation', data);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            serverConnection_1.default.open();
+            operation.executeViaConnection();
+        });
+        serverConnection_1.default.onNotifyMessage('TestWsOp', function (newData) {
+            expect(newData.item1).toBe(8);
+            expect(newData.item2).toBe('test');
+            expect(newData.item3.getFullYear()).toBe(data.item3.getFullYear() + 5);
+            done();
+        });
+    });
+});
+
+
+/***/ }),
+/* 15 */,
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2044,7 +2192,7 @@ __webpack_require__(4);
 
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2234,7 +2382,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports) {
 
 var g;
@@ -2261,10 +2409,51 @@ module.exports = g;
 
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var cookie_1 = __webpack_require__(9);
+var json_1 = __webpack_require__(0);
+var CookieStorage = (function () {
+    function CookieStorage() {
+    }
+    CookieStorage.prototype.set = function (key, value, timeToLive) {
+        if (typeof value !== 'object') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(timeToLive || undefined);
+        cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
+    };
+    CookieStorage.prototype.get = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (!itemStr) {
+            return null;
+        }
+        var storeItem = json_1.default.parse(itemStr);
+        if (typeof storeItem !== 'object') {
+            return null;
+        }
+        return storeItem;
+    };
+    CookieStorage.prototype.remove = function (key) {
+        cookie_1.default.deleteCookie(key);
+    };
+    return CookieStorage;
+}());
+exports.CookieStorage = CookieStorage;
+;
+var cookieStorage = new CookieStorage();
+exports.default = cookieStorage;
+
 
 /***/ })
 /******/ ]);
