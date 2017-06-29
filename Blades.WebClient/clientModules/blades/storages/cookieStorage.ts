@@ -5,12 +5,12 @@ import ITempStorage from './tempStorage';
 
 export class CookieStorage implements ITempStorage {
 
-    public set(key: string, value: Object, timeToLive?: number): void {
+    public set(key: string, value: Object, expire?: number | Date): void {
         if (typeof value !== 'object') {
             return;
         }
 
-        const options = new CookieOptions(timeToLive || undefined);
+        const options = new CookieOptions(expire);
         cookie.setCookie(key, json.stringify(value), options); 
     }
 
@@ -26,6 +26,24 @@ export class CookieStorage implements ITempStorage {
         }
 
         return storeItem;
+    }
+
+    public setStr(key: string, value: string, expire?: number | Date): void {
+        if (typeof value !== 'string') {
+            return;
+        }
+
+        const options = new CookieOptions(expire);
+        cookie.setCookie(key, value, options);
+    }
+
+    public getStr(key: string): string {
+        const itemStr = cookie.getCookie(key);
+        if (typeof itemStr !== 'string') {
+            return null;
+        }
+
+        return itemStr;
     }
 
     public remove(key: string): void {

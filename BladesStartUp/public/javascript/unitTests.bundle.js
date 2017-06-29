@@ -1589,29 +1589,45 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var json_1 = __webpack_require__(0);
-var deathTimeField = '__deathTime';
+var StoreItem = (function () {
+    function StoreItem(data, expire) {
+        this.data = data;
+        this.expire = expire;
+    }
+    return StoreItem;
+}());
+;
+function expireValueKey(key) {
+    return key + "__expire";
+}
+;
+function getExpireDateNumber(expire) {
+    if (typeof expire === 'number') {
+        return Date.now() + expire;
+    }
+    else if (expire.getTime) {
+        return expire.getTime();
+    }
+    return 0;
+}
+;
+function isShouldRemove(expire) {
+    return expire && expire < Date.now();
+}
+;
 var BrowserStorage = (function () {
     function BrowserStorage(storage) {
         this.storage = storage;
     }
-    BrowserStorage.prototype.set = function (key, value, timeToLive) {
+    BrowserStorage.prototype.set = function (key, value, expire) {
         if (typeof value !== 'object') {
             return;
         }
-        var storeItem = __assign({}, value);
-        if (timeToLive) {
-            var deathTime = Date.now() + timeToLive;
-            storeItem[deathTimeField] = deathTime;
+        var storeItem = new StoreItem(value);
+        if (expire) {
+            storeItem.expire = getExpireDateNumber(expire);
         }
         this.storage.setItem(key, json_1.default.stringify(storeItem));
     };
@@ -1624,14 +1640,33 @@ var BrowserStorage = (function () {
         if (typeof storeItem !== 'object') {
             return null;
         }
-        if (storeItem[deathTimeField] < Date.now()) {
+        if (isShouldRemove(storeItem.expire)) {
             this.storage.removeItem(key);
             return null;
         }
-        return storeItem;
+        return storeItem.data;
+    };
+    BrowserStorage.prototype.setStr = function (key, value, expire) {
+        if (typeof value !== 'string') {
+            return;
+        }
+        this.storage.setItem(key, value);
+        if (expire) {
+            this.storage.setItem(expireValueKey(key), getExpireDateNumber(expire).toString());
+        }
+    };
+    BrowserStorage.prototype.getStr = function (key) {
+        var expire = parseInt(this.storage.getItem(expireValueKey(key)));
+        if (isShouldRemove(expire)) {
+            this.storage.removeItem(expireValueKey(key));
+            this.storage.removeItem(key);
+            return null;
+        }
+        return this.storage.getItem(key);
     };
     BrowserStorage.prototype.remove = function (key) {
         this.storage.removeItem(key);
+        this.storage.removeItem(expireValueKey(key));
     };
     return BrowserStorage;
 }());
@@ -1668,16 +1703,19 @@ var browserStorage_1 = __webpack_require__(7);
 var cookieStorage_1 = __webpack_require__(20);
 describe('Blades Temp storage tests', function () {
     describe('Local storage test', function () {
-        testScript(browserStorage_1.localStorage);
+        testScript(browserStorage_1.localStorage, false);
     });
     describe('Session storage test', function () {
-        testScript(browserStorage_1.sessionStorage);
+        testScript(browserStorage_1.sessionStorage, false);
     });
     describe('Cookie storage test', function () {
-        testScript(cookieStorage_1.default);
+        testScript(cookieStorage_1.default, true);
     });
 });
-function testScript(storage) {
+function testScript(storage, longInterval) {
+    var expireInterval = longInterval ? 2000 : 150;
+    var test1Interval = longInterval ? 100 : 50;
+    var test2Interval = longInterval ? 3000 : 250;
     it('Add item', function () {
         var item = { a: 5 };
         storage.set('item', item);
@@ -1686,16 +1724,31 @@ function testScript(storage) {
     });
     it('Add item with expired', function (done) {
         var item = { a: 5 };
-        storage.set('item', item, 150);
+        storage.set('item', item, expireInterval);
         setTimeout(function () {
             var savedItem = storage.get('item');
             expect(savedItem['a']).toBe(5);
-        }, 50);
+        }, test1Interval);
         setTimeout(function () {
             var savedItem = storage.get('item');
             expect(savedItem).toBeNull();
             done();
-        }, 250);
+        }, test2Interval);
+    });
+    it('Add str value and expire in Date format', function (done) {
+        var item = 'Test String';
+        var expireDate = new Date();
+        expireDate.setTime(Date.now() + expireInterval);
+        storage.setStr('item', item, expireDate);
+        setTimeout(function () {
+            var savedStr = storage.getStr('item');
+            expect(savedStr).toBe(item);
+        }, test1Interval);
+        setTimeout(function () {
+            var savedStr = storage.getStr('item');
+            expect(savedStr).toBeNull();
+            done();
+        }, test2Interval);
     });
     it('Remove item', function () {
         var item = { a: 6 };
@@ -1812,18 +1865,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var tokenInfo_1 = __webpack_require__(13);
 var xhr_1 = __webpack_require__(3);
 var noop_1 = __webpack_require__(1);
-var cookie_1 = __webpack_require__(9);
+var cookieStorage_1 = __webpack_require__(20);
 var Auth = (function () {
-    function Auth(accessTokenInfoStorageKey, accessTokenCookieName) {
-        this.accessTokenPath = '/token';
+    function Auth(accessTokenKey, storage) {
+        this.accessTokenKey = accessTokenKey;
+        this.storage = storage;
+        this.accessTokenApiPath = '/token';
         this.tokenInfoChangedHandlers = [];
-        this.accessTokenInfoStorageKey = accessTokenInfoStorageKey;
-        this.accessTokenCookieName = accessTokenCookieName;
     }
     Auth.prototype.requestNewAccessToken = function (login, password) {
         var data = "grant_type=password&username=" + login + "&password=" + password;
         var date = new Date();
-        var xhr = new xhr_1.default(this.accessTokenPath, 'POST', data);
+        var xhr = new xhr_1.default(this.accessTokenApiPath, 'POST', data);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
         return xhr.execute().then(function (result) {
             var info = new tokenInfo_1.default();
@@ -1834,12 +1887,18 @@ var Auth = (function () {
             return info;
         });
     };
+    Object.defineProperty(Auth.prototype, "accessTokenInfoKey", {
+        get: function () {
+            return this.accessTokenKey + "__tokenInfo";
+        },
+        enumerable: true,
+        configurable: true
+    });
     Auth.prototype.getTokenInfo = function () {
-        var tokenInfoJson = localStorage.getItem(this.accessTokenInfoStorageKey);
-        if (!tokenInfoJson) {
+        var tokenInfo = this.storage.get(this.accessTokenInfoKey);
+        if (!tokenInfo) {
             return null;
         }
-        var tokenInfo = tokenInfo_1.default.fromJson(tokenInfoJson);
         return tokenInfo;
     };
     Auth.prototype.addAccessTokenToRequestHeader = function (xhr) {
@@ -1853,15 +1912,15 @@ var Auth = (function () {
     Auth.prototype.authorize = function (login, password) {
         var _this = this;
         return this.requestNewAccessToken(login, password).then(function (tokenInfo) {
-            localStorage.setItem(_this.accessTokenInfoStorageKey, tokenInfo.toJson());
-            cookie_1.default.setCookie(_this.accessTokenCookieName, tokenInfo.token, new cookie_1.CookieOptions(tokenInfo.expireDate));
+            _this.storage.set(_this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
+            _this.storage.setStr(_this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
             _this.tokenInfoChanged(tokenInfo);
             return tokenInfo;
         });
     };
     Auth.prototype.clearTokenInfo = function () {
-        localStorage.removeItem(this.accessTokenInfoStorageKey);
-        cookie_1.default.deleteCookie(this.accessTokenCookieName);
+        this.storage.remove(this.accessTokenInfoKey);
+        this.storage.remove(this.accessTokenKey);
         this.tokenInfoChanged(null);
     };
     Auth.prototype.onTokenInfoChanged = function (handler) {
@@ -1880,11 +1939,14 @@ var Auth = (function () {
     Auth.prototype.tokenInfoChanged = function (newInfo) {
         this.tokenInfoChangedHandlers.forEach(function (handler) { return handler(newInfo); });
     };
+    Auth.prototype.setStorage = function (storage) {
+        this.storage = storage;
+    };
     return Auth;
 }());
 exports.Auth = Auth;
 ;
-var auth = new Auth('accessTokenInfo', 'accessToken');
+var auth = new Auth('accessToken', cookieStorage_1.default);
 exports.default = auth;
 
 
@@ -1971,9 +2033,6 @@ var json_1 = __webpack_require__(0);
 var TokenInfo = (function () {
     function TokenInfo() {
     }
-    TokenInfo.prototype.toJson = function () {
-        return json_1.default.stringify(this);
-    };
     TokenInfo.fromJson = function (jsonStr) {
         var obj = json_1.default.parse(jsonStr);
         if (!obj) {
@@ -2426,11 +2485,11 @@ var json_1 = __webpack_require__(0);
 var CookieStorage = (function () {
     function CookieStorage() {
     }
-    CookieStorage.prototype.set = function (key, value, timeToLive) {
+    CookieStorage.prototype.set = function (key, value, expire) {
         if (typeof value !== 'object') {
             return;
         }
-        var options = new cookie_1.CookieOptions(timeToLive || undefined);
+        var options = new cookie_1.CookieOptions(expire);
         cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
     };
     CookieStorage.prototype.get = function (key) {
@@ -2443,6 +2502,20 @@ var CookieStorage = (function () {
             return null;
         }
         return storeItem;
+    };
+    CookieStorage.prototype.setStr = function (key, value, expire) {
+        if (typeof value !== 'string') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(expire);
+        cookie_1.default.setCookie(key, value, options);
+    };
+    CookieStorage.prototype.getStr = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (typeof itemStr !== 'string') {
+            return null;
+        }
+        return itemStr;
     };
     CookieStorage.prototype.remove = function (key) {
         cookie_1.default.deleteCookie(key);

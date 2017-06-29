@@ -5,10 +5,6 @@ export default class TokenInfo {
     public token: string;
     public expireDate: Date;
 
-    public toJson(): string {
-        return json.stringify(this);
-    }
-
     public static fromJson(jsonStr: string): TokenInfo {
         let obj = json.parse(jsonStr);
         if (!obj) {

@@ -2,25 +2,20 @@
 import TokenInfo from './tokenInfo';
 import Xhr from './xhr';
 import noop from '../tools/noop';
-import cookie, { CookieOptions } from '../tools/cookie';
+import ITempStorage from '../storages/tempStorage';
+import cookieStorage from '../storages/cookieStorage';
 
 export class Auth {
 
-    private accessTokenInfoStorageKey: string;
-    private accessTokenCookieName: string;
+    public readonly accessTokenApiPath: string = '/token';
 
-    public accessTokenPath: string = '/token';
-
-
-    constructor(accessTokenInfoStorageKey: string, accessTokenCookieName: string) {
-        this.accessTokenInfoStorageKey = accessTokenInfoStorageKey;
-        this.accessTokenCookieName = accessTokenCookieName;
+    constructor(private accessTokenKey: string, private storage: ITempStorage) {
     }
 
     public requestNewAccessToken(login: string, password: string): Promise<TokenInfo> {
         let data = `grant_type=password&username=${login}&password=${password}`;
         let date = new Date();
-        let xhr = new Xhr(this.accessTokenPath, 'POST', data);
+        let xhr = new Xhr(this.accessTokenApiPath, 'POST', data);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
         return xhr.execute().then(result => {
             let info = new TokenInfo();
@@ -33,13 +28,16 @@ export class Auth {
 
     }
 
+    private get accessTokenInfoKey() {
+        return `${this.accessTokenKey}__tokenInfo`;
+    }
+
     public getTokenInfo(): TokenInfo {
-        let tokenInfoJson = localStorage.getItem(this.accessTokenInfoStorageKey);
-        if (!tokenInfoJson) {
+        const tokenInfo = <TokenInfo>this.storage.get(this.accessTokenInfoKey);
+        if (!tokenInfo) {
             return null;
         }
 
-        let tokenInfo = TokenInfo.fromJson(tokenInfoJson);
         return tokenInfo;
     }
 
@@ -54,16 +52,16 @@ export class Auth {
 
     public authorize(login: string, password: string): Promise<TokenInfo> {
         return this.requestNewAccessToken(login, password).then((tokenInfo: TokenInfo) => {
-            localStorage.setItem(this.accessTokenInfoStorageKey, tokenInfo.toJson());
-            cookie.setCookie(this.accessTokenCookieName, tokenInfo.token, new CookieOptions(tokenInfo.expireDate));
+            this.storage.set(this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
+            this.storage.setStr(this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
             this.tokenInfoChanged(tokenInfo);
             return tokenInfo;
         });
     }
 
     public clearTokenInfo(): void {
-        localStorage.removeItem(this.accessTokenInfoStorageKey);
-        cookie.deleteCookie(this.accessTokenCookieName);
+        this.storage.remove(this.accessTokenInfoKey);
+        this.storage.remove(this.accessTokenKey);
         this.tokenInfoChanged(null);
     }
 
@@ -87,7 +85,11 @@ export class Auth {
         this.tokenInfoChangedHandlers.forEach(handler => handler(newInfo));
     }
 
+
+    public setStorage(storage: ITempStorage): void {
+        this.storage = storage;
+    }
 };
 
-const auth = new Auth('accessTokenInfo', 'accessToken');
+const auth = new Auth('accessToken', cookieStorage);
 export default auth;
