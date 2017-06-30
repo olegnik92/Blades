@@ -5,13 +5,13 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using Owin.WebSocket;
-using Newtonsoft.Json;
 using Microsoft.Owin;
 using Blades.Interfaces;
 using Blades.Core;
 using Blades.Extensions;
 using System.Security.Claims;
 using Newtonsoft.Json.Serialization;
+using Blades.Web.Interfaces;
 
 namespace Blades.Web
 {
@@ -21,15 +21,14 @@ namespace Blades.Web
         public Guid Id { get; private set; } = Guid.NewGuid();
 
         private static string[] testMessageSeparator = new string[] { "@@@@@" };
-        private static JsonSerializerSettings jsonSettings = new JsonSerializerSettings() { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
 
-        protected IOperationMetaInfoProvider metaInfo;
+        protected IDataConverter converter;
         protected IOperationsExecutor executor;
         protected ILogger log;
-        public ClientConnection(IOperationMetaInfoProvider metaInfo, IOperationsExecutor executor, ILogger log)
+        public ClientConnection(IDataConverter converter, IOperationsExecutor executor, ILogger log)
         {
-            this.metaInfo = metaInfo;
+            this.converter = converter;
             this.executor = executor;
             this.log = log;
         }
@@ -58,14 +57,12 @@ namespace Blades.Web
                 {
                     var dataStr = Encoding.UTF8.GetString(message.Array, message.Offset, message.Count);
                     var dataParts = dataStr.Split(testMessageSeparator, 3, StringSplitOptions.None);
-                    if (OperationRequestTypes.JsonOperation.Equals(dataParts[0]))
-                    {
-                        var operationName = dataParts[1];
-                        var operationData = dataParts[2];
-                        var info = metaInfo.Get(operationName);
-                        var data = JsonConvert.DeserializeObject(operationData, info.DataType);
-                        Task.Run(() => executor.Execute(operationName, data, User));
-                    }
+                    var dataFormat = dataParts[0].ToDataFormatEnum();
+                    var operationName = dataParts[1];
+                    var rawData = dataParts[2];
+                    var data = converter.ParseRequestData(rawData, operationName, dataFormat);
+
+                    Task.Run(() => executor.Execute(operationName, data, User));
                 }
                 return base.OnMessageReceived(message, type);
             }
@@ -81,7 +78,7 @@ namespace Blades.Web
         {
             try
             {
-                var json = JsonConvert.SerializeObject(message, jsonSettings);
+                var json = converter.ToJson(message);
                 var data = Encoding.UTF8.GetBytes(json);
                 return SendText(data, true);
             }

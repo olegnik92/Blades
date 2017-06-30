@@ -46,6 +46,7 @@
     <Compile Include="Basis\OperationsActivator.cs" />
     <Compile Include="Basis\OperationsExecutor.cs" />
     <Compile Include="Basis\OperationMetaInfoProvider.cs" />
+    <Compile Include="Basis\TypeIdMap.cs" />
     <Compile Include="Core\Error.cs" />
     <Compile Include="Core\NotifyMessage.cs" />
     <Compile Include="Core\Operation.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Core\OperationType.cs" />
     <Compile Include="Core\OperationExecutionException.cs" />
     <Compile Include="Core\Resource.cs" />
+    <Compile Include="Core\TypeIdAttribute.cs" />
     <Compile Include="Core\UserInfo.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\PrincipalExtensions.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Interfaces\IOperationsActivator.cs" />
     <Compile Include="Interfaces\IOperationsExecutor.cs" />
     <Compile Include="Interfaces\IOperationsHistory.cs" />
+    <Compile Include="Interfaces\ITypeIdMap.cs" />
     <Compile Include="Interfaces\IUsersNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

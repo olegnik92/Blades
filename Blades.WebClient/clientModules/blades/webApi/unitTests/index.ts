@@ -198,6 +198,41 @@ describe('Xhr tests', () => {
         });
 
     });
+
+
+    it('TestOperation.ChildrenTypesData', (done) => {
+        const baseType = { field1: 10 };
+        const childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        const childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        let operation0 = new JsonOperation('TestOperation.ChildrenTypesData', baseType);
+        let operation1 = new JsonOperation('TestOperation.ChildrenTypesData', childType1);
+        let operation2 = new JsonOperation('TestOperation.ChildrenTypesData', childType2);
+        operation0.execute().then((result: number) => {
+            expect(result).toBe(baseType.field1);
+            return operation1.execute();
+        }).then((result: number) => {
+            expect(result).toBe(childType1.field1 + childType1.field2);
+            return operation2.execute();
+        }).then((result: number) => {
+            expect(result).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
+
+    it('TestOperation.ListOfChildrenTypes', (done) => {
+        const baseType = { field1: 10 };
+        const childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        const childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        const data = [baseType, childType1, childType2];
+        const operation = new JsonOperation('TestOperation.ListOfChildrenTypes', data);
+        operation.execute().then((results: Array<number>) => {
+            expect(results.length).toBe(3);
+            expect(results[0]).toBe(baseType.field1);
+            expect(results[1]).toBe(childType1.field1 + childType1.field2);
+            expect(results[2]).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
 });
 
 

@@ -10,20 +10,22 @@ using Owin.WebSocket;
 using Owin.WebSocket.Extensions;
 using Microsoft.Practices.ServiceLocation;
 using Blades.Interfaces;
+using Blades.Web.Interfaces;
 
 namespace Blades.Web
 {
     public static class StartupHelper
     {
-        public static HttpConfiguration InitWebApiConfiguration(IAppBuilder appBuilder)
+        public static HttpConfiguration InitWebApiConfiguration(IAppBuilder appBuilder, IBladesServiceLocator locator)
         {
+            var converter = locator.GetInstance<IDataConverter>();
             var webApiConfig = new HttpConfiguration();
             webApiConfig.Routes.MapHttpRoute(
                 name: "BladesWebApiRoute",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            webApiConfig.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            webApiConfig.Formatters.JsonFormatter.SerializerSettings = converter.GetSerializerSettings();
             webApiConfig.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
 
             return webApiConfig;
@@ -55,7 +57,7 @@ namespace Blades.Web
         {
             if (serviceType.Equals(typeof(ClientConnection)))
             {
-                return new ClientConnection(locator.GetInstance<IOperationMetaInfoProvider>(), locator.GetInstance<IOperationsExecutor>(), locator.GetInstance<ILogger>());
+                return new ClientConnection(locator.GetInstance<IDataConverter>(), locator.GetInstance<IOperationsExecutor>(), locator.GetInstance<ILogger>());
             }
             throw new ArithmeticException("Unknown service Type in WebSocketServiceLocator");
         }

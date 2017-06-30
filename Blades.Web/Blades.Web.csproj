@@ -73,10 +73,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basis\DataConverter.cs" />
+    <Compile Include="Basis\TypeIdBinder.cs" />
+    <Compile Include="Interfaces\IDataConverter.cs" />
     <Compile Include="Web\ClientConnection.cs" />
     <Compile Include="Web\ClientConnectionsManager.cs" />
+    <Compile Include="Web\DataFromat.cs" />
     <Compile Include="Web\OperationController.cs" />
-    <Compile Include="Web\OperationRequestTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\StartupHelper.cs" />
     <Compile Include="Web\UsersNotifier.cs" />
@@ -93,6 +96,7 @@
       <Name>Blades.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

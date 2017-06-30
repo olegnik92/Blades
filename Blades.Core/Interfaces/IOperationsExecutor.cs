@@ -13,6 +13,8 @@ namespace Blades.Interfaces
 
         TResult Execute<TData, TResult>(Operation<TData, TResult> operation);
 
+        TResult Execute<TData, TResult>(Operation<TData, TResult> operation, Operation parentOperation, OperationExecutionReport parentOperationReport);
+
         object Execute(string operationName, object data, UserInfo user);
 
         object Execute(Operation operation);

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Blades.Web
+namespace Blades.Interfaces
 {
-    public class OperationRequestTypes
+    public interface ITypeIdMap : IBladesService
     {
-        public const string JsonOperation = "JsonOperation";
+        Type Get(Guid id);
+
+        Guid Get(Type type);
     }
 }

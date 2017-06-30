@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blades.Core
 {
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public class OperationAttribute : Attribute
     {
         public string Name { get; private set; }

@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 17);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -125,8 +125,52 @@ exports.default = json;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var noop = function () { };
-exports.default = noop;
+var cookie_1 = __webpack_require__(10);
+var json_1 = __webpack_require__(0);
+var CookieStorage = (function () {
+    function CookieStorage() {
+    }
+    CookieStorage.prototype.set = function (key, value, expire) {
+        if (typeof value !== 'object') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(expire);
+        cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
+    };
+    CookieStorage.prototype.get = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (!itemStr) {
+            return null;
+        }
+        var storeItem = json_1.default.parse(itemStr);
+        if (typeof storeItem !== 'object') {
+            return null;
+        }
+        return storeItem;
+    };
+    CookieStorage.prototype.setStr = function (key, value, expire) {
+        if (typeof value !== 'string') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(expire);
+        cookie_1.default.setCookie(key, value, options);
+    };
+    CookieStorage.prototype.getStr = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (typeof itemStr !== 'string') {
+            return null;
+        }
+        return itemStr;
+    };
+    CookieStorage.prototype.remove = function (key) {
+        cookie_1.default.deleteCookie(key);
+    };
+    return CookieStorage;
+}());
+exports.CookieStorage = CookieStorage;
+;
+var cookieStorage = new CookieStorage();
+exports.default = cookieStorage;
 
 
 /***/ }),
@@ -136,8 +180,19 @@ exports.default = noop;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var noop = function () { };
+exports.default = noop;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_1 = __webpack_require__(0);
-var noop_1 = __webpack_require__(1);
+var noop_1 = __webpack_require__(2);
 var ServerConnection = (function () {
     function ServerConnection() {
         this.connectionProtocol = 'ws'; //or wss
@@ -264,15 +319,15 @@ exports.default = connection;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var es6_promise_1 = __webpack_require__(6);
+var es6_promise_1 = __webpack_require__(7);
 var json_1 = __webpack_require__(0);
-var RequestExecutionError_1 = __webpack_require__(10);
+var RequestExecutionError_1 = __webpack_require__(11);
 var Xhr = (function () {
     function Xhr(url, method, body) {
         if (method === void 0) { method = 'GET'; }
@@ -382,18 +437,18 @@ exports.default = Xhr;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(8);
-__webpack_require__(14);
+__webpack_require__(9);
+__webpack_require__(15);
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 describe('Jasmine own tests', function () {
@@ -409,7 +464,7 @@ describe('Jasmine own tests', function () {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {var require;/*!
@@ -548,7 +603,7 @@ function flush() {
 function attemptVertx() {
   try {
     var r = require;
-    var vertx = __webpack_require__(19);
+    var vertx = __webpack_require__(20);
     vertxNext = vertx.runOnLoop || vertx.runOnContext;
     return useVertxTimer();
   } catch (e) {
@@ -1571,10 +1626,10 @@ return Promise;
 })));
 //# sourceMappingURL=es6-promise.map
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17), __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18), __webpack_require__(19)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1693,14 +1748,14 @@ exports.localStorage = new LocalStorage();
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var browserStorage_1 = __webpack_require__(7);
-var cookieStorage_1 = __webpack_require__(20);
+var browserStorage_1 = __webpack_require__(8);
+var cookieStorage_1 = __webpack_require__(1);
 describe('Blades Temp storage tests', function () {
     describe('Local storage test', function () {
         testScript(browserStorage_1.localStorage, false);
@@ -1764,7 +1819,7 @@ function testScript(storage, longInterval) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1819,7 +1874,7 @@ exports.default = cookie;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1856,16 +1911,16 @@ exports.default = RequestExecutionError;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var tokenInfo_1 = __webpack_require__(13);
-var xhr_1 = __webpack_require__(3);
-var noop_1 = __webpack_require__(1);
-var cookieStorage_1 = __webpack_require__(20);
+var tokenInfo_1 = __webpack_require__(14);
+var xhr_1 = __webpack_require__(4);
+var noop_1 = __webpack_require__(2);
+var cookieStorage_1 = __webpack_require__(1);
 var Auth = (function () {
     function Auth(accessTokenKey, storage) {
         this.accessTokenKey = accessTokenKey;
@@ -1951,7 +2006,7 @@ exports.default = auth;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1967,8 +2022,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var xhr_1 = __webpack_require__(3);
-var serverConnection_1 = __webpack_require__(2);
+var xhr_1 = __webpack_require__(4);
+var serverConnection_1 = __webpack_require__(3);
 var json_1 = __webpack_require__(0);
 var BaseOperation = (function () {
     function BaseOperation(name, data, requestType, requestMethod) {
@@ -1992,7 +2047,7 @@ var JsonOperation = (function (_super) {
     function JsonOperation(name, data) {
         var _this = this;
         var strData = json_1.default.stringify(data);
-        _this = _super.call(this, name, strData, 'JsonOperation', 'POST') || this;
+        _this = _super.call(this, name, strData, 'json', 'POST') || this;
         return _this;
     }
     JsonOperation.prototype.execute = function () {
@@ -2023,7 +2078,7 @@ exports.FormDataOperation = FormDataOperation;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2050,15 +2105,15 @@ exports.default = TokenInfo;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var serverOperations_1 = __webpack_require__(12);
-var serverConnection_1 = __webpack_require__(2);
-var auth_1 = __webpack_require__(11);
+var serverOperations_1 = __webpack_require__(13);
+var serverConnection_1 = __webpack_require__(3);
+var auth_1 = __webpack_require__(12);
 var Tuple = (function () {
     function Tuple() {
     }
@@ -2216,6 +2271,38 @@ describe('Xhr tests', function () {
             });
         });
     });
+    it('TestOperation.ChildrenTypesData', function (done) {
+        var baseType = { field1: 10 };
+        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        var operation0 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', baseType);
+        var operation1 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType1);
+        var operation2 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType2);
+        operation0.execute().then(function (result) {
+            expect(result).toBe(baseType.field1);
+            return operation1.execute();
+        }).then(function (result) {
+            expect(result).toBe(childType1.field1 + childType1.field2);
+            return operation2.execute();
+        }).then(function (result) {
+            expect(result).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
+    it('TestOperation.ListOfChildrenTypes', function (done) {
+        var baseType = { field1: 10 };
+        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        var data = [baseType, childType1, childType2];
+        var operation = new serverOperations_1.JsonOperation('TestOperation.ListOfChildrenTypes', data);
+        operation.execute().then(function (results) {
+            expect(results.length).toBe(3);
+            expect(results[0]).toBe(baseType.field1);
+            expect(results[1]).toBe(childType1.field1 + childType1.field2);
+            expect(results[2]).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
 });
 describe('Web socket connection Tests', function () {
     it('TestOperation.WebSocketOperation; test 1', function (done) {
@@ -2239,19 +2326,19 @@ describe('Web socket connection Tests', function () {
 
 
 /***/ }),
-/* 15 */,
-/* 16 */
+/* 16 */,
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(6);
 __webpack_require__(5);
-__webpack_require__(4);
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2441,7 +2528,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 var g;
@@ -2468,65 +2555,10 @@ module.exports = g;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var cookie_1 = __webpack_require__(9);
-var json_1 = __webpack_require__(0);
-var CookieStorage = (function () {
-    function CookieStorage() {
-    }
-    CookieStorage.prototype.set = function (key, value, expire) {
-        if (typeof value !== 'object') {
-            return;
-        }
-        var options = new cookie_1.CookieOptions(expire);
-        cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
-    };
-    CookieStorage.prototype.get = function (key) {
-        var itemStr = cookie_1.default.getCookie(key);
-        if (!itemStr) {
-            return null;
-        }
-        var storeItem = json_1.default.parse(itemStr);
-        if (typeof storeItem !== 'object') {
-            return null;
-        }
-        return storeItem;
-    };
-    CookieStorage.prototype.setStr = function (key, value, expire) {
-        if (typeof value !== 'string') {
-            return;
-        }
-        var options = new cookie_1.CookieOptions(expire);
-        cookie_1.default.setCookie(key, value, options);
-    };
-    CookieStorage.prototype.getStr = function (key) {
-        var itemStr = cookie_1.default.getCookie(key);
-        if (typeof itemStr !== 'string') {
-            return null;
-        }
-        return itemStr;
-    };
-    CookieStorage.prototype.remove = function (key) {
-        cookie_1.default.deleteCookie(key);
-    };
-    return CookieStorage;
-}());
-exports.CookieStorage = CookieStorage;
-;
-var cookieStorage = new CookieStorage();
-exports.default = cookieStorage;
-
 
 /***/ })
 /******/ ]);

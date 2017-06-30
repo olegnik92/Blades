@@ -1,7 +1,6 @@
 ﻿using Blades.Core;
 using Blades.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Blades.Web.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +18,12 @@ namespace Blades.Web
 {
     public class OperationController : ApiController
     {
-        protected IOperationMetaInfoProvider metaInfo;
+        protected IDataConverter converter;
         protected IOperationsExecutor executor;
         protected ILogger log;
-        public OperationController(IOperationMetaInfoProvider metaInfo, IOperationsExecutor executor, ILogger log)
+        public OperationController(IDataConverter converter, IOperationsExecutor executor, ILogger log)
         {
-            this.metaInfo = metaInfo;
+            this.converter = converter;
             this.executor = executor;
             this.log = log;
         }
@@ -36,14 +35,10 @@ namespace Blades.Web
         {
             try
             {
-                var requestType = Request.Headers.GetValues("x-blades-operation-request-type").FirstOrDefault();
+                var requestFormat = Request.Headers.GetValues("x-blades-operation-request-type").FirstOrDefault().ToDataFormatEnum();
                 var operationName = Request.Headers.GetValues("x-blades-operation-name").FirstOrDefault();
-                var operationMetaInfo = metaInfo.Get(operationName);
-                if (requestType == OperationRequestTypes.JsonOperation)
-                {
-                    string rawJson = await Request.Content.ReadAsStringAsync();
-                    RequestData = JsonConvert.DeserializeObject(rawJson, operationMetaInfo.DataType);
-                }
+                string rawData = await Request.Content.ReadAsStringAsync();
+                RequestData = converter.ParseRequestData(rawData, operationName, requestFormat);
 
                 var context = Request.GetOwinContext();
                 var user = new UserInfo(context.Request.User as ClaimsPrincipal);

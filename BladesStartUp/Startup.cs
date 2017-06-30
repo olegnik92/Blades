@@ -26,7 +26,7 @@ namespace BladesStartUp
             Blades.Auth.StartupHelper.OAuthConfiguration(appBuilder, di.GetInstance<Blades.Auth.Interfaces.IAuthManager>(), accessTokenExpireTimeSpan: TimeSpan.FromDays(1));
 
 
-            var config = Blades.Web.StartupHelper.InitWebApiConfiguration(appBuilder);
+            var config = Blades.Web.StartupHelper.InitWebApiConfiguration(appBuilder, di);
             di.InitControllerActivator(config);
             appBuilder.UseWebApi(config);
 

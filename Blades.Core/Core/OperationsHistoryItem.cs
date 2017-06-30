@@ -12,6 +12,8 @@ namespace Blades.Core
 
         public Guid Id { get; set; }
 
+        public Guid ParentOperationId { get; set; }
+
         public string Name { get; set; }
 
         public string Title { get; set; }
@@ -32,6 +34,7 @@ namespace Blades.Core
         public OperationsHistoryItem(Operation operation)
         {
             Id = operation.Id;
+            ParentOperationId = operation.ParentOpearionId;
             Name = operation.Name;
             User = operation.User;
             Title = operation.Title;

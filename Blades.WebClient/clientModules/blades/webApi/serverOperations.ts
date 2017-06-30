@@ -39,7 +39,7 @@ export class JsonOperation extends BaseOperation {
 
     public constructor(name: string, data: Object) {
         let strData = json.stringify(data);
-        super(name, strData, 'JsonOperation', 'POST');
+        super(name, strData, 'json', 'POST');
     }
 
     public execute(): Promise<any> {

@@ -18,6 +18,8 @@ using Blades.Core;
 using MongoDB.Driver;
 using Blades.Commands.Interfaces;
 using Blades.Commands.Basis;
+using Blades.Web.Interfaces;
+using Blades.Web.Basis;
 
 namespace BladesStartUp
 {
@@ -45,6 +47,8 @@ namespace BladesStartUp
             container.Register(Component.For<ICommandEmitter>().ImplementedBy<CommandEmiter>());
             container.Register(Component.For<ICommandsHistory>().ImplementedBy<MemoryCommandsHistory>());
             container.Register(Component.For<ICommandReceiverActivator>().ImplementedBy<CommandReceiverActivator>());
+            container.Register(Component.For<IDataConverter>().ImplementedBy<DataConverter>());
+            container.Register(Component.For<ITypeIdMap>().ImplementedBy<TypeIdMap>());
 
             RegisterOperationTypes(container);
 

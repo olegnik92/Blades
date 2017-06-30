@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestOperations\ObjectInheritanceTests.cs" />
     <Compile Include="TestOperations\WebApiTests.cs" />
   </ItemGroup>
   <ItemGroup>
