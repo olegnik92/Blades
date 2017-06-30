@@ -70,6 +70,7 @@
     <TypeScriptCompile Include="clientModules\blades\storages\tempStorage.ts" />
     <TypeScriptCompile Include="clientModules\blades\storages\unitTests\index.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\cookie.ts" />
+    <TypeScriptCompile Include="clientModules\blades\tools\guid.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\json.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\noop.ts" />
     <TypeScriptCompile Include="clientModules\blades\tools\storageTabsCommunicator.ts" />
