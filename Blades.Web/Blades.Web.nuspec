@@ -4,9 +4,10 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>$author$</authors>
+    <authors>Nikishin Oleg</authors>
+    <owners>Nikishin Oleg</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
+    <description>Blades Library web server toolkit.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2017</copyright>
   </metadata>
