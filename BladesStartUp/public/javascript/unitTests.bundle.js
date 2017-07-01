@@ -122,351 +122,6 @@ exports.default = json;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var cookie_1 = __webpack_require__(10);
-var json_1 = __webpack_require__(0);
-var CookieStorage = (function () {
-    function CookieStorage() {
-    }
-    CookieStorage.prototype.set = function (key, value, expire) {
-        if (typeof value !== 'object') {
-            return;
-        }
-        var options = new cookie_1.CookieOptions(expire);
-        cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
-    };
-    CookieStorage.prototype.get = function (key) {
-        var itemStr = cookie_1.default.getCookie(key);
-        if (!itemStr) {
-            return null;
-        }
-        var storeItem = json_1.default.parse(itemStr);
-        if (typeof storeItem !== 'object') {
-            return null;
-        }
-        return storeItem;
-    };
-    CookieStorage.prototype.setStr = function (key, value, expire) {
-        if (typeof value !== 'string') {
-            return;
-        }
-        var options = new cookie_1.CookieOptions(expire);
-        cookie_1.default.setCookie(key, value, options);
-    };
-    CookieStorage.prototype.getStr = function (key) {
-        var itemStr = cookie_1.default.getCookie(key);
-        if (typeof itemStr !== 'string') {
-            return null;
-        }
-        return itemStr;
-    };
-    CookieStorage.prototype.remove = function (key) {
-        cookie_1.default.deleteCookie(key);
-    };
-    return CookieStorage;
-}());
-exports.CookieStorage = CookieStorage;
-;
-var cookieStorage = new CookieStorage();
-exports.default = cookieStorage;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var noop = function () { };
-exports.default = noop;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var json_1 = __webpack_require__(0);
-var noop_1 = __webpack_require__(2);
-var ServerConnection = (function () {
-    function ServerConnection() {
-        this.connectionProtocol = 'ws'; //or wss
-        this.connectionRoute = 'ws';
-        this.reconnectTimeout = 15000;
-        this.reconnectIntervalRef = 0;
-        this.sendMessagesTimeout = 100;
-        this.sendMessagesIntervalRef = 0;
-        this.messagesQueue = [];
-        this.rawMessageHandlers = [];
-        this.notifyMessageHandlers = {};
-    }
-    ServerConnection.prototype.open = function () {
-        var _this = this;
-        if (this.isOpen) {
-            return;
-        }
-        this.connect();
-        clearInterval(this.reconnectIntervalRef);
-        this.reconnectIntervalRef = setInterval(function () {
-            if (!_this.ws || _this.ws.readyState !== WebSocket.OPEN) {
-                _this.connect();
-            }
-        }, this.reconnectTimeout);
-    };
-    ServerConnection.prototype.close = function () {
-        if (this.ws) {
-            this.ws.close();
-        }
-        clearInterval(this.reconnectIntervalRef);
-    };
-    Object.defineProperty(ServerConnection.prototype, "isOpen", {
-        get: function () {
-            if (!this.ws) {
-                return false;
-            }
-            return this.ws.readyState === WebSocket.OPEN;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ServerConnection.prototype.connect = function () {
-        var _this = this;
-        this.ws = new WebSocket(this.connectionProtocol + "://" + document.location.host + "/" + this.connectionRoute);
-        this.bindEvents();
-        clearInterval(this.sendMessagesIntervalRef);
-        this.sendMessagesIntervalRef = setInterval(function () {
-            _this.sendMessagesFromQueue();
-        }, this.sendMessagesTimeout);
-    };
-    ServerConnection.prototype.bindEvents = function () {
-        var _this = this;
-        this.ws.onclose = function () {
-            clearInterval(_this.sendMessagesIntervalRef);
-        };
-        this.ws.onmessage = function (ev) {
-            _this.rawMessage(ev);
-            _this.processNotifyMessage(ev);
-        };
-    };
-    ServerConnection.prototype.sendMessagesFromQueue = function () {
-        while (this.messagesQueue.length > 0) {
-            if (this.ws.readyState !== WebSocket.OPEN) {
-                break;
-            }
-            var data = this.messagesQueue.shift();
-            this.ws.send(data);
-        }
-    };
-    ServerConnection.prototype.send = function (data) {
-        this.messagesQueue.push(data);
-    };
-    ServerConnection.prototype.rawMessage = function (e) {
-        this.rawMessageHandlers.forEach(function (handler) { return handler(e); });
-    };
-    ServerConnection.prototype.onRawMessage = function (handler) {
-        var _this = this;
-        if (!handler) {
-            return noop_1.default;
-        }
-        this.rawMessageHandlers.push(handler);
-        return function () {
-            var index = _this.rawMessageHandlers.indexOf(handler);
-            if (index > -1) {
-                _this.rawMessageHandlers.splice(index, 1);
-            }
-        };
-    };
-    ServerConnection.prototype.processNotifyMessage = function (e) {
-        try {
-            var message_1 = json_1.default.parse(e.data);
-            if (message_1.messageRole === 'NotifyMessage'
-                && message_1.name
-                && this.notifyMessageHandlers[message_1.name]) {
-                this.notifyMessageHandlers[message_1.name]
-                    .forEach(function (handler) { return handler(message_1.data, message_1.attributes); });
-            }
-        }
-        catch (e) {
-            //ignore
-        }
-    };
-    ServerConnection.prototype.onNotifyMessage = function (name, handler) {
-        var _this = this;
-        if (!(name && handler)) {
-            return noop_1.default;
-        }
-        if (!this.notifyMessageHandlers[name]) {
-            this.notifyMessageHandlers[name] = [];
-        }
-        this.notifyMessageHandlers[name].push(handler);
-        return function () {
-            var index = _this.notifyMessageHandlers[name].indexOf(handler);
-            if (index > -1) {
-                _this.notifyMessageHandlers[name].splice(index, 1);
-            }
-        };
-    };
-    return ServerConnection;
-}());
-exports.ServerConnection = ServerConnection;
-var connection = new ServerConnection();
-exports.default = connection;
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var es6_promise_1 = __webpack_require__(7);
-var json_1 = __webpack_require__(0);
-var RequestExecutionError_1 = __webpack_require__(11);
-var Xhr = (function () {
-    function Xhr(url, method, body) {
-        if (method === void 0) { method = 'GET'; }
-        this.xhr = new XMLHttpRequest();
-        this.reqUrl = url;
-        this.reqMethod = method;
-        this.reqBody = body;
-        this.xhr.open(this.reqMethod, this.reqUrl, true);
-    }
-    Object.defineProperty(Xhr.prototype, "innerXhr", {
-        get: function () {
-            return this.xhr;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Xhr.prototype, "status", {
-        get: function () {
-            return this.xhr.status;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Xhr.prototype, "statusText", {
-        get: function () {
-            return this.xhr.statusText;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Xhr.prototype, "response", {
-        get: function () {
-            return this.xhr.response;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Xhr.prototype, "responseText", {
-        get: function () {
-            return this.xhr.responseText;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Xhr.prototype, "readyState", {
-        get: function () {
-            return this.xhr.readyState;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Xhr.prototype.setRequestHeader = function (header, value) {
-        this.xhr.setRequestHeader(header, value);
-    };
-    Xhr.prototype.rawExecute = function () {
-        var _this = this;
-        return new es6_promise_1.Promise(function (res, rej) {
-            _this.xhr.send(_this.reqBody);
-            _this.xhr.onreadystatechange = (function () {
-                if (_this.xhr.readyState !== XMLHttpRequest.DONE) {
-                    return;
-                }
-                res(_this);
-            });
-            _this.xhr.onerror = (function (ev) {
-                rej(_this);
-            });
-        });
-    };
-    Xhr.beforeExecution = function (hook) {
-        var next = Xhr.beforeExecutionChain;
-        Xhr.beforeExecutionChain = (function (xhr) { return hook(xhr).then(next); });
-    };
-    Xhr.afterExecution = function (hook) {
-        var next = Xhr.afterExecutionChain;
-        Xhr.afterExecutionChain = (function (xhr) { return hook(xhr).then(next); });
-    };
-    Xhr.createResData = function (xhr) {
-        if (xhr.readyState !== XMLHttpRequest.DONE) {
-            throw new Error('Try to parse XHR in incorrect state');
-        }
-        var data = json_1.default.parse(xhr.responseText);
-        return data;
-    };
-    Xhr.prototype.execute = function () {
-        var _this = this;
-        return new es6_promise_1.Promise(function (res, rej) {
-            Xhr.beforeExecutionChain(_this)
-                .then(function (xhr) { return xhr.rawExecute(); })
-                .then(function (xhr) { return Xhr.afterExecutionChain(xhr); })
-                .then(function (xhr) {
-                if (xhr.status !== 200) {
-                    rej(new RequestExecutionError_1.default(xhr));
-                    return;
-                }
-                var data = Xhr.createResData(xhr);
-                res(data);
-            })
-                .catch(function (err) { return rej(new RequestExecutionError_1.default(err)); });
-        });
-    };
-    return Xhr;
-}());
-Xhr.beforeExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
-Xhr.afterExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
-exports.default = Xhr;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(9);
-__webpack_require__(15);
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-describe('Jasmine own tests', function () {
-    it('True to be true', function () {
-        var a = true;
-        expect(a).toBe(true);
-    });
-    it('1 to be 1 and 2 to be 2', function () {
-        expect(1).toBe(1);
-        expect(2).toBe(2);
-    });
-});
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* WEBPACK VAR INJECTION */(function(process, global) {var require;/*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
@@ -1629,6 +1284,359 @@ return Promise;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18), __webpack_require__(19)))
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var cookie_1 = __webpack_require__(10);
+var json_1 = __webpack_require__(0);
+var CookieStorage = (function () {
+    function CookieStorage() {
+    }
+    CookieStorage.prototype.set = function (key, value, expire) {
+        if (typeof value !== 'object') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(expire);
+        cookie_1.default.setCookie(key, json_1.default.stringify(value), options);
+    };
+    CookieStorage.prototype.get = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (!itemStr) {
+            return null;
+        }
+        var storeItem = json_1.default.parse(itemStr);
+        if (typeof storeItem !== 'object') {
+            return null;
+        }
+        return storeItem;
+    };
+    CookieStorage.prototype.setStr = function (key, value, expire) {
+        if (typeof value !== 'string') {
+            return;
+        }
+        var options = new cookie_1.CookieOptions(expire);
+        cookie_1.default.setCookie(key, value, options);
+    };
+    CookieStorage.prototype.getStr = function (key) {
+        var itemStr = cookie_1.default.getCookie(key);
+        if (typeof itemStr !== 'string') {
+            return null;
+        }
+        return itemStr;
+    };
+    CookieStorage.prototype.remove = function (key) {
+        cookie_1.default.deleteCookie(key);
+    };
+    return CookieStorage;
+}());
+exports.CookieStorage = CookieStorage;
+;
+var cookieStorage = new CookieStorage();
+exports.default = cookieStorage;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var es6_promise_1 = __webpack_require__(1);
+var noop = function () { };
+exports.default = noop;
+exports.echo = function (data) { return data; };
+exports.echoPromise = function (data) {
+    return new es6_promise_1.Promise(function (res, rej) {
+        res(data);
+    });
+};
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var json_1 = __webpack_require__(0);
+var noop_1 = __webpack_require__(3);
+var ServerConnection = (function () {
+    function ServerConnection() {
+        this.connectionProtocol = 'ws'; //or wss
+        this.connectionRoute = 'ws';
+        this.reconnectTimeout = 15000;
+        this.reconnectIntervalRef = 0;
+        this.sendMessagesTimeout = 100;
+        this.sendMessagesIntervalRef = 0;
+        this.messagesQueue = [];
+        this.rawMessageHandlers = [];
+        this.notifyMessageHandlers = {};
+    }
+    ServerConnection.prototype.open = function () {
+        var _this = this;
+        if (this.isOpen) {
+            return;
+        }
+        this.connect();
+        clearInterval(this.reconnectIntervalRef);
+        this.reconnectIntervalRef = setInterval(function () {
+            if (!_this.ws || _this.ws.readyState !== WebSocket.OPEN) {
+                _this.connect();
+            }
+        }, this.reconnectTimeout);
+    };
+    ServerConnection.prototype.close = function () {
+        if (this.ws) {
+            this.ws.close();
+        }
+        clearInterval(this.reconnectIntervalRef);
+    };
+    Object.defineProperty(ServerConnection.prototype, "isOpen", {
+        get: function () {
+            if (!this.ws) {
+                return false;
+            }
+            return this.ws.readyState === WebSocket.OPEN;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ServerConnection.prototype.connect = function () {
+        var _this = this;
+        this.ws = new WebSocket(this.connectionProtocol + "://" + document.location.host + "/" + this.connectionRoute);
+        this.bindEvents();
+        clearInterval(this.sendMessagesIntervalRef);
+        this.sendMessagesIntervalRef = setInterval(function () {
+            _this.sendMessagesFromQueue();
+        }, this.sendMessagesTimeout);
+    };
+    ServerConnection.prototype.bindEvents = function () {
+        var _this = this;
+        this.ws.onclose = function () {
+            clearInterval(_this.sendMessagesIntervalRef);
+        };
+        this.ws.onmessage = function (ev) {
+            _this.rawMessage(ev);
+            _this.processNotifyMessage(ev);
+        };
+    };
+    ServerConnection.prototype.sendMessagesFromQueue = function () {
+        while (this.messagesQueue.length > 0) {
+            if (this.ws.readyState !== WebSocket.OPEN) {
+                break;
+            }
+            var data = this.messagesQueue.shift();
+            this.ws.send(data);
+        }
+    };
+    ServerConnection.prototype.send = function (data) {
+        this.messagesQueue.push(data);
+    };
+    ServerConnection.prototype.rawMessage = function (e) {
+        this.rawMessageHandlers.forEach(function (handler) { return handler(e); });
+    };
+    ServerConnection.prototype.onRawMessage = function (handler) {
+        var _this = this;
+        if (!handler) {
+            return noop_1.default;
+        }
+        this.rawMessageHandlers.push(handler);
+        return function () {
+            var index = _this.rawMessageHandlers.indexOf(handler);
+            if (index > -1) {
+                _this.rawMessageHandlers.splice(index, 1);
+            }
+        };
+    };
+    ServerConnection.prototype.processNotifyMessage = function (e) {
+        try {
+            var message_1 = json_1.default.parse(e.data);
+            if (message_1.messageRole === 'NotifyMessage'
+                && message_1.name
+                && this.notifyMessageHandlers[message_1.name]) {
+                this.notifyMessageHandlers[message_1.name]
+                    .forEach(function (handler) { return handler(message_1.data, message_1.attributes); });
+            }
+        }
+        catch (e) {
+            //ignore
+        }
+    };
+    ServerConnection.prototype.onNotifyMessage = function (name, handler) {
+        var _this = this;
+        if (!(name && handler)) {
+            return noop_1.default;
+        }
+        if (!this.notifyMessageHandlers[name]) {
+            this.notifyMessageHandlers[name] = [];
+        }
+        this.notifyMessageHandlers[name].push(handler);
+        return function () {
+            var index = _this.notifyMessageHandlers[name].indexOf(handler);
+            if (index > -1) {
+                _this.notifyMessageHandlers[name].splice(index, 1);
+            }
+        };
+    };
+    return ServerConnection;
+}());
+exports.ServerConnection = ServerConnection;
+var connection = new ServerConnection();
+exports.default = connection;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var es6_promise_1 = __webpack_require__(1);
+var json_1 = __webpack_require__(0);
+var RequestExecutionError_1 = __webpack_require__(11);
+var Xhr = (function () {
+    function Xhr(url, method, body) {
+        if (method === void 0) { method = 'GET'; }
+        this.xhr = new XMLHttpRequest();
+        this.reqUrl = url;
+        this.reqMethod = method;
+        this.reqBody = body;
+        this.xhr.open(this.reqMethod, this.reqUrl, true);
+    }
+    Object.defineProperty(Xhr.prototype, "innerXhr", {
+        get: function () {
+            return this.xhr;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr.prototype, "status", {
+        get: function () {
+            return this.xhr.status;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr.prototype, "statusText", {
+        get: function () {
+            return this.xhr.statusText;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr.prototype, "response", {
+        get: function () {
+            return this.xhr.response;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr.prototype, "responseText", {
+        get: function () {
+            return this.xhr.responseText;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr.prototype, "readyState", {
+        get: function () {
+            return this.xhr.readyState;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Xhr.prototype.setRequestHeader = function (header, value) {
+        this.xhr.setRequestHeader(header, value);
+    };
+    Xhr.prototype.rawExecute = function () {
+        var _this = this;
+        return new es6_promise_1.Promise(function (res, rej) {
+            _this.xhr.send(_this.reqBody);
+            _this.xhr.onreadystatechange = (function () {
+                if (_this.xhr.readyState !== XMLHttpRequest.DONE) {
+                    return;
+                }
+                res(_this);
+            });
+            _this.xhr.onerror = (function (ev) {
+                rej(_this);
+            });
+        });
+    };
+    Xhr.beforeExecution = function (hook) {
+        var next = Xhr.beforeExecutionChain;
+        Xhr.beforeExecutionChain = (function (xhr) { return hook(xhr).then(next); });
+    };
+    Xhr.afterExecution = function (hook) {
+        var next = Xhr.afterExecutionChain;
+        Xhr.afterExecutionChain = (function (xhr) { return hook(xhr).then(next); });
+    };
+    Xhr.createResData = function (xhr) {
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+            throw new Error('Try to parse XHR in incorrect state');
+        }
+        var data = json_1.default.parse(xhr.responseText);
+        return data;
+    };
+    Xhr.prototype.execute = function () {
+        var _this = this;
+        return new es6_promise_1.Promise(function (res, rej) {
+            Xhr.beforeExecutionChain(_this)
+                .then(function (xhr) { return xhr.rawExecute(); })
+                .then(function (xhr) { return Xhr.afterExecutionChain(xhr); })
+                .then(function (xhr) {
+                if (xhr.status !== 200) {
+                    rej(new RequestExecutionError_1.default(xhr));
+                    return;
+                }
+                var data = Xhr.createResData(xhr);
+                res(data);
+            })
+                .catch(function (err) { return rej(new RequestExecutionError_1.default(err)); });
+        });
+    };
+    return Xhr;
+}());
+Xhr.beforeExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
+Xhr.afterExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
+exports.default = Xhr;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(21);
+__webpack_require__(9);
+__webpack_require__(15);
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+describe('Jasmine own tests', function () {
+    it('True to be true', function () {
+        var a = true;
+        expect(a).toBe(true);
+    });
+    it('1 to be 1 and 2 to be 2', function () {
+        expect(1).toBe(1);
+        expect(2).toBe(2);
+    });
+});
+
+
+/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1755,7 +1763,7 @@ exports.localStorage = new LocalStorage();
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var browserStorage_1 = __webpack_require__(8);
-var cookieStorage_1 = __webpack_require__(1);
+var cookieStorage_1 = __webpack_require__(2);
 describe('Blades Temp storage tests', function () {
     describe('Local storage test', function () {
         testScript(browserStorage_1.localStorage, false);
@@ -1918,9 +1926,9 @@ exports.default = RequestExecutionError;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var tokenInfo_1 = __webpack_require__(14);
-var xhr_1 = __webpack_require__(4);
-var noop_1 = __webpack_require__(2);
-var cookieStorage_1 = __webpack_require__(1);
+var xhr_1 = __webpack_require__(5);
+var noop_1 = __webpack_require__(3);
+var cookieStorage_1 = __webpack_require__(2);
 var Auth = (function () {
     function Auth(accessTokenKey, storage) {
         this.accessTokenKey = accessTokenKey;
@@ -2022,8 +2030,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var xhr_1 = __webpack_require__(4);
-var serverConnection_1 = __webpack_require__(3);
+var xhr_1 = __webpack_require__(5);
+var serverConnection_1 = __webpack_require__(4);
 var json_1 = __webpack_require__(0);
 var BaseOperation = (function () {
     function BaseOperation(name, data, requestType, requestMethod) {
@@ -2112,7 +2120,7 @@ exports.default = TokenInfo;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var serverOperations_1 = __webpack_require__(13);
-var serverConnection_1 = __webpack_require__(3);
+var serverConnection_1 = __webpack_require__(4);
 var auth_1 = __webpack_require__(12);
 var Tuple = (function () {
     function Tuple() {
@@ -2333,8 +2341,8 @@ describe('Web socket connection Tests', function () {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(7);
 __webpack_require__(6);
-__webpack_require__(5);
 
 
 /***/ }),
@@ -2559,6 +2567,477 @@ module.exports = g;
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var barrier_1 = __webpack_require__(22);
+var syncActionsChain_1 = __webpack_require__(23);
+var asyncActionsChain_1 = __webpack_require__(24);
+var es6_promise_1 = __webpack_require__(1);
+describe('Blades Tools tests', function () {
+    describe('Barrier tests', function () {
+        barrierTests();
+    });
+    describe('Sync actions chain tests', function () {
+        syncActionsChainTests();
+    });
+    describe('Async actions chain tests', function () {
+        asyncActionsChainTests();
+    });
+});
+function barrierTests() {
+    it('Only last call Test', function (done) {
+        var barrier = new barrier_1.default(100);
+        var callsCounter = 0;
+        var inc = function () {
+            callsCounter++;
+        };
+        barrier.exec(inc);
+        barrier.exec(inc);
+        setTimeout(function () {
+            barrier.exec(inc);
+        }, 30);
+        setTimeout(function () {
+            barrier.exec(inc);
+        }, 50);
+        setTimeout(function () {
+            expect(callsCounter).toBe(1);
+            done();
+        }, 200);
+    });
+    it('Exec after Interval', function (done) {
+        var barrier = new barrier_1.default(100);
+        var callsCounter = 0;
+        var inc = function () {
+            callsCounter++;
+        };
+        setTimeout(function () {
+            barrier.exec(inc);
+        }, 30);
+        setTimeout(function () {
+            barrier.exec(inc);
+        }, 50);
+        setTimeout(function () {
+            barrier.exec(inc);
+        }, 200);
+        setTimeout(function () {
+            expect(callsCounter).toBe(2);
+            done();
+        }, 350);
+    });
+    it('Exec one by one', function (done) {
+        var barrier = new barrier_1.default(-1); //without wait
+        var callsCounter = 0;
+        barrier.execAsync(function () {
+            return new es6_promise_1.Promise(function (res, rej) {
+                setTimeout(function () {
+                    expect(callsCounter).toBe(0);
+                    callsCounter++;
+                    res();
+                }, 50);
+            });
+        });
+        barrier.execAsync(function () {
+            return new es6_promise_1.Promise(function (res, rej) {
+                setTimeout(function () {
+                    expect(callsCounter).toBe(1);
+                    callsCounter++;
+                    res();
+                }, 50);
+            });
+        });
+        barrier.execAsync(function () {
+            return new es6_promise_1.Promise(function (res, rej) {
+                setTimeout(function () {
+                    expect(callsCounter).toBe(2);
+                    callsCounter++;
+                    res();
+                }, 50);
+            });
+        });
+        setTimeout(function () {
+            done();
+        }, 200);
+    });
+    it('Only last call Test Async', function (done) {
+        var barrier = new barrier_1.default(50);
+        var callsCounter = 0;
+        barrier.execAsync(function () {
+            return new es6_promise_1.Promise(function (res, rej) {
+                setTimeout(function () {
+                    expect(false).toBeTruthy(); //should not fired
+                    callsCounter++;
+                    res();
+                }, 50);
+            });
+        });
+        setTimeout(function () {
+            barrier.execAsync(function () {
+                return new es6_promise_1.Promise(function (res, rej) {
+                    setTimeout(function () {
+                        expect(callsCounter).toBe(0); //should  fired
+                        callsCounter++;
+                        res();
+                    }, 50);
+                });
+            });
+        }, 10);
+        setTimeout(function () {
+            barrier.execAsync(function () {
+                return new es6_promise_1.Promise(function (res, rej) {
+                    setTimeout(function () {
+                        expect(callsCounter).toBe(1); //should  fired
+                        callsCounter++;
+                        res();
+                    }, 50);
+                });
+            });
+        }, 70);
+        setTimeout(function () {
+            expect(callsCounter).toBe(2);
+            done();
+        }, 200);
+    });
+}
+;
+var A = (function () {
+    function A() {
+    }
+    return A;
+}());
+function syncActionsChainTests() {
+    it('Chain', function () {
+        var chain = new syncActionsChain_1.default();
+        var test = new A();
+        test.a = 0;
+        chain.addLast(function (d) {
+            expect(d.a).toBe(1);
+            d.a++;
+            return d;
+        });
+        chain.addFirst(function (d) {
+            expect(d.a).toBe(0);
+            d.a++;
+            return d;
+        });
+        chain.addLast(function (d) {
+            expect(d.a).toBe(2);
+            d.a++;
+            return d;
+        });
+        expect(test.a).toBe(0);
+        test = chain.run(test);
+        expect(test.a).toBe(3);
+    });
+    it('Empty Chain', function () {
+        var chain = new syncActionsChain_1.default();
+        var test = new A();
+        test.a = 0;
+        expect(test.a).toBe(0);
+        test = chain.run(test);
+        expect(test.a).toBe(0);
+    });
+    it('Remove from Chain', function () {
+        var chain = new syncActionsChain_1.default();
+        var test = new A();
+        test.a = 0;
+        var remove = chain.addLast(function (d) {
+            d.a++;
+            return d;
+        });
+        chain.addFirst(function (d) {
+            d.a++;
+            return d;
+        });
+        chain.addLast(function (d) {
+            d.a++;
+            return d;
+        });
+        expect(test.a).toBe(0);
+        test = chain.run(test);
+        expect(test.a).toBe(3);
+        test.a = 0;
+        remove();
+        test = chain.run(test);
+        expect(test.a).toBe(2);
+    });
+}
+;
+function asyncActionsChainTests() {
+    it('Chain', function (done) {
+        var chain = new asyncActionsChain_1.default();
+        var test = new A();
+        test.a = 0;
+        chain.addLast(function (d) {
+            return new es6_promise_1.Promise(function (res) {
+                setTimeout(function () {
+                    expect(d.a).toBe(1);
+                    d.a++;
+                    res(d);
+                }, 10);
+            });
+        });
+        chain.addFirst(function (d) {
+            return new es6_promise_1.Promise(function (res) {
+                setTimeout(function () {
+                    expect(d.a).toBe(0);
+                    d.a++;
+                    res(d);
+                }, 10);
+            });
+        });
+        chain.addLast(function (d) {
+            return new es6_promise_1.Promise(function (res) {
+                setTimeout(function () {
+                    expect(d.a).toBe(2);
+                    d.a++;
+                    res(d);
+                }, 10);
+            });
+        });
+        expect(test.a).toBe(0);
+        chain.run(test).then(function (d) {
+            expect(d.a).toBe(3);
+            done();
+        });
+    });
+    it('Empty Chain', function (done) {
+        var chain = new asyncActionsChain_1.default();
+        var test = new A();
+        test.a = 0;
+        expect(test.a).toBe(0);
+        chain.run(test).then(function (d) {
+            expect(d.a).toBe(0);
+            done();
+        });
+    });
+    it('Remove from Chain', function (done) {
+        var chain = new asyncActionsChain_1.default();
+        var test = new A();
+        function getIncFunc() {
+            return function (d) {
+                return new es6_promise_1.Promise(function (res) {
+                    setTimeout(function () {
+                        d.a++;
+                        res(d);
+                    }, 10);
+                });
+            };
+        }
+        ;
+        chain.addLast(getIncFunc());
+        var remove = chain.addLast(getIncFunc());
+        chain.addLast(getIncFunc());
+        test.a = 0;
+        chain.run(test).then(function (d) {
+            expect(d.a).toBe(3);
+        }).then(function () {
+            test.a = 0;
+            remove();
+            return chain.run(test);
+        }).then(function (d) {
+            expect(d.a).toBe(2);
+            done();
+        });
+    });
+}
+;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var es6_promise_1 = __webpack_require__(1);
+var Barrier = (function () {
+    function Barrier(waitTime) {
+        this.waitTime = waitTime;
+        this.timeoutId = 0;
+        this.deferred = null;
+    }
+    Barrier.prototype.exec = function (action) {
+        if (this.timeoutId) {
+            this.cancelWaitAction();
+        }
+        if (this.isWaitMode()) {
+            this.executeWaitAction(action);
+        }
+        else {
+            action();
+        }
+    };
+    Barrier.prototype.isWaitMode = function () {
+        return this.waitTime >= 0;
+    };
+    Barrier.prototype.cancelWaitAction = function () {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = 0;
+    };
+    Barrier.prototype.executeWaitAction = function (action) {
+        var _this = this;
+        this.timeoutId = setTimeout(function () {
+            action();
+            _this.timeoutId = 0;
+        }, this.waitTime);
+    };
+    ;
+    Barrier.prototype.execAsync = function (action) {
+        if (this.timeoutId) {
+            this.cancelWaitAction();
+        }
+        if (this.isWaitMode()) {
+            this.addToDeferredWithWait(action);
+        }
+        else {
+            this.addToDeferred(action);
+        }
+    };
+    ;
+    Barrier.prototype.addToDeferred = function (action) {
+        if (this.deferred == null) {
+            this.deferred = new es6_promise_1.Promise(function (res, rej) {
+                action().then(res).catch(rej);
+            });
+        }
+        else {
+            this.deferred = this.deferred.then(function () {
+                return action();
+            });
+        }
+    };
+    ;
+    Barrier.prototype.addToDeferredWithWait = function (action) {
+        var _this = this;
+        this.timeoutId = setTimeout(function () {
+            _this.addToDeferred(action);
+            _this.timeoutId = 0;
+        }, this.waitTime);
+    };
+    ;
+    return Barrier;
+}());
+;
+exports.default = Barrier;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var noop_1 = __webpack_require__(3);
+var SyncActionsChain = (function () {
+    function SyncActionsChain() {
+        this.chain = [];
+    }
+    SyncActionsChain.prototype.addLast = function (item) {
+        return this.add(item, true);
+    };
+    SyncActionsChain.prototype.addFirst = function (item) {
+        return this.add(item, false);
+    };
+    SyncActionsChain.prototype.add = function (item, toEnd) {
+        var _this = this;
+        if (typeof item !== 'function') {
+            return noop_1.default;
+        }
+        if (toEnd) {
+            this.chain.push(item);
+        }
+        else {
+            this.chain.unshift(item);
+        }
+        return function () {
+            var index = _this.chain.indexOf(item);
+            if (index > -1) {
+                _this.chain.splice(index, 1);
+            }
+        };
+    };
+    SyncActionsChain.prototype.run = function (data) {
+        for (var i = 0; i < this.chain.length; i++) {
+            data = this.chain[i](data);
+        }
+        return data;
+    };
+    return SyncActionsChain;
+}());
+;
+exports.default = SyncActionsChain;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var noop_1 = __webpack_require__(3);
+var AsyncActionsChain = (function () {
+    function AsyncActionsChain() {
+        this.chain = [];
+        this.asyncAction = this.buildChain();
+    }
+    AsyncActionsChain.prototype.addLast = function (item) {
+        return this.add(item, true);
+    };
+    AsyncActionsChain.prototype.addFirst = function (item) {
+        return this.add(item, false);
+    };
+    AsyncActionsChain.prototype.add = function (item, toEnd) {
+        var _this = this;
+        if (typeof item !== 'function') {
+            return noop_1.default;
+        }
+        if (toEnd) {
+            this.chain.push(item);
+        }
+        else {
+            this.chain.unshift(item);
+        }
+        this.asyncAction = this.buildChain();
+        return function () {
+            var index = _this.chain.indexOf(item);
+            if (index > -1) {
+                _this.chain.splice(index, 1);
+                _this.asyncAction = _this.buildChain();
+            }
+        };
+    };
+    AsyncActionsChain.prototype.run = function (data) {
+        return this.asyncAction(data);
+    };
+    AsyncActionsChain.prototype.buildChain = function () {
+        var _this = this;
+        var action = noop_1.echoPromise;
+        if (this.chain.length === 0) {
+            return action;
+        }
+        var _loop_1 = function (i) {
+            var oldAction = action;
+            action = (function (data) { return oldAction(data).then(_this.chain[i]); });
+        };
+        for (var i = 0; i < this.chain.length; i++) {
+            _loop_1(i);
+        }
+        return action;
+    };
+    return AsyncActionsChain;
+}());
+;
+exports.default = AsyncActionsChain;
+
 
 /***/ })
 /******/ ]);
