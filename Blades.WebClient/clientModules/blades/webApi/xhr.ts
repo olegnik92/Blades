@@ -1,6 +1,7 @@
 ﻿import { Promise } from 'es6-promise';
 import json from '../tools/json';
 import RequestExecutionError from './RequestExecutionError';
+import AsyncActionsChain from '../tools/asyncActionsChain';
 
 
 export default class Xhr {
@@ -68,21 +69,16 @@ export default class Xhr {
     }
 
 
-    private static beforeExecutionChain: (xhr: Xhr) => Promise<Xhr> =
-    (xhr) => new Promise<Xhr>(res => res(xhr));
+    private static beforeExecutionChain: AsyncActionsChain<Xhr> = new AsyncActionsChain<Xhr>();
 
-    private static afterExecutionChain: (xhr: Xhr) => Promise<Xhr> =
-    (xhr) => new Promise<Xhr>(res => res(xhr));
+    private static afterExecutionChain: AsyncActionsChain<Xhr> = new AsyncActionsChain<Xhr>();
 
-
-    public static beforeExecution(hook: (xhr: Xhr) => Promise<Xhr>): void {
-        const next = Xhr.beforeExecutionChain;
-        Xhr.beforeExecutionChain = ((xhr) => hook(xhr).then(next));
+    public static get beforeExecChain(): AsyncActionsChain<Xhr> {
+        return Xhr.beforeExecutionChain;
     }
 
-    public static afterExecution(hook: (xhr: Xhr) => Promise<Xhr>): void {
-        const next = Xhr.afterExecutionChain;
-        Xhr.afterExecutionChain = ((xhr) => hook(xhr).then(next));
+    public static get afterExecChain(): AsyncActionsChain<Xhr> {
+        return Xhr.afterExecutionChain;
     }
 
     private static createResData(xhr: Xhr): any {
@@ -96,9 +92,9 @@ export default class Xhr {
 
     public execute(): Promise<any> {
         return new Promise<any>((res, rej) => {
-            Xhr.beforeExecutionChain(this)
+            Xhr.beforeExecutionChain.run(this)
                 .then(xhr => xhr.rawExecute())
-                .then(xhr => Xhr.afterExecutionChain(xhr))
+                .then(xhr => Xhr.afterExecutionChain.run(xhr))
                 .then(xhr => {
                     if (xhr.status !== 200) {
                         rej(new RequestExecutionError(xhr));
