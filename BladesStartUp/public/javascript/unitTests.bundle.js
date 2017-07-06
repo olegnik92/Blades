@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -258,7 +258,7 @@ function flush() {
 function attemptVertx() {
   try {
     var r = require;
-    var vertx = __webpack_require__(20);
+    var vertx = __webpack_require__(24);
     vertxNext = vertx.runOnLoop || vertx.runOnContext;
     return useVertxTimer();
   } catch (e) {
@@ -1281,7 +1281,7 @@ return Promise;
 })));
 //# sourceMappingURL=es6-promise.map
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18), __webpack_require__(19)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22), __webpack_require__(23)))
 
 /***/ }),
 /* 2 */
@@ -1290,7 +1290,31 @@ return Promise;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var cookie_1 = __webpack_require__(10);
+var es6_promise_1 = __webpack_require__(1);
+var noop = function () { };
+exports.default = noop;
+function echo(data) {
+    return data;
+}
+exports.echo = echo;
+;
+function echoPromise(data) {
+    return new es6_promise_1.Promise(function (res, rej) {
+        res(data);
+    });
+}
+exports.echoPromise = echoPromise;
+;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var cookie_1 = __webpack_require__(12);
 var json_1 = __webpack_require__(0);
 var CookieStorage = (function () {
     function CookieStorage() {
@@ -1339,32 +1363,77 @@ exports.default = cookieStorage;
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var es6_promise_1 = __webpack_require__(1);
-var noop = function () { };
-exports.default = noop;
-exports.echo = function (data) { return data; };
-exports.echoPromise = function (data) {
-    return new es6_promise_1.Promise(function (res, rej) {
-        res(data);
-    });
-};
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var noop_1 = __webpack_require__(2);
+var AsyncActionsChain = (function () {
+    function AsyncActionsChain() {
+        this.chain = [];
+        this.asyncAction = this.buildChain();
+    }
+    AsyncActionsChain.prototype.addLast = function (item) {
+        return this.add(item, true);
+    };
+    AsyncActionsChain.prototype.addFirst = function (item) {
+        return this.add(item, false);
+    };
+    AsyncActionsChain.prototype.add = function (item, toEnd) {
+        var _this = this;
+        if (typeof item !== 'function') {
+            return noop_1.default;
+        }
+        if (toEnd) {
+            this.chain.push(item);
+        }
+        else {
+            this.chain.unshift(item);
+        }
+        this.asyncAction = this.buildChain();
+        return function () {
+            var index = _this.chain.indexOf(item);
+            if (index > -1) {
+                _this.chain.splice(index, 1);
+                _this.asyncAction = _this.buildChain();
+            }
+        };
+    };
+    AsyncActionsChain.prototype.run = function (data) {
+        return this.asyncAction(data);
+    };
+    AsyncActionsChain.prototype.buildChain = function () {
+        var _this = this;
+        var action = noop_1.echoPromise;
+        if (this.chain.length === 0) {
+            return action;
+        }
+        var _loop_1 = function (i) {
+            var oldAction = action;
+            action = (function (data) { return oldAction(data).then(_this.chain[i]); });
+        };
+        for (var i = 0; i < this.chain.length; i++) {
+            _loop_1(i);
+        }
+        return action;
+    };
+    return AsyncActionsChain;
+}());
+;
+exports.default = AsyncActionsChain;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_1 = __webpack_require__(0);
-var noop_1 = __webpack_require__(3);
+var noop_1 = __webpack_require__(2);
 var ServerConnection = (function () {
     function ServerConnection() {
         this.connectionProtocol = 'ws'; //or wss
@@ -1491,7 +1560,7 @@ exports.default = connection;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1499,8 +1568,8 @@ exports.default = connection;
 Object.defineProperty(exports, "__esModule", { value: true });
 var es6_promise_1 = __webpack_require__(1);
 var json_1 = __webpack_require__(0);
-var RequestExecutionError_1 = __webpack_require__(11);
-var asyncActionsChain_1 = __webpack_require__(24);
+var RequestExecutionError_1 = __webpack_require__(15);
+var asyncActionsChain_1 = __webpack_require__(4);
 var Xhr = (function () {
     function Xhr(url, method, body) {
         if (method === void 0) { method = 'GET'; }
@@ -1608,27 +1677,27 @@ var Xhr = (function () {
                 .catch(function (err) { return rej(new RequestExecutionError_1.default(err)); });
         });
     };
+    Xhr.beforeExecutionChain = new asyncActionsChain_1.default();
+    Xhr.afterExecutionChain = new asyncActionsChain_1.default();
     return Xhr;
 }());
-Xhr.beforeExecutionChain = new asyncActionsChain_1.default();
-Xhr.afterExecutionChain = new asyncActionsChain_1.default();
 exports.default = Xhr;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(21);
-__webpack_require__(9);
-__webpack_require__(15);
+__webpack_require__(14);
+__webpack_require__(10);
+__webpack_require__(19);
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 describe('Jasmine own tests', function () {
@@ -1644,7 +1713,7 @@ describe('Jasmine own tests', function () {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1763,14 +1832,14 @@ exports.localStorage = new LocalStorage();
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var browserStorage_1 = __webpack_require__(8);
-var cookieStorage_1 = __webpack_require__(2);
+var browserStorage_1 = __webpack_require__(9);
+var cookieStorage_1 = __webpack_require__(3);
 describe('Blades Temp storage tests', function () {
     describe('Local storage test', function () {
         testScript(browserStorage_1.localStorage, false);
@@ -1834,7 +1903,86 @@ function testScript(storage, longInterval) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var es6_promise_1 = __webpack_require__(1);
+var Barrier = (function () {
+    function Barrier(waitTime) {
+        this.waitTime = waitTime;
+        this.timeoutId = 0;
+        this.deferred = null;
+    }
+    Barrier.prototype.exec = function (action) {
+        if (this.timeoutId) {
+            this.cancelWaitAction();
+        }
+        if (this.isWaitMode()) {
+            this.executeWaitAction(action);
+        }
+        else {
+            action();
+        }
+    };
+    Barrier.prototype.isWaitMode = function () {
+        return this.waitTime >= 0;
+    };
+    Barrier.prototype.cancelWaitAction = function () {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = 0;
+    };
+    Barrier.prototype.executeWaitAction = function (action) {
+        var _this = this;
+        this.timeoutId = setTimeout(function () {
+            action();
+            _this.timeoutId = 0;
+        }, this.waitTime);
+    };
+    ;
+    Barrier.prototype.execAsync = function (action) {
+        if (this.timeoutId) {
+            this.cancelWaitAction();
+        }
+        if (this.isWaitMode()) {
+            this.addToDeferredWithWait(action);
+        }
+        else {
+            this.addToDeferred(action);
+        }
+    };
+    ;
+    Barrier.prototype.addToDeferred = function (action) {
+        if (this.deferred == null) {
+            this.deferred = new es6_promise_1.Promise(function (res, rej) {
+                action().then(res).catch(rej);
+            });
+        }
+        else {
+            this.deferred = this.deferred.then(function () {
+                return action();
+            });
+        }
+    };
+    ;
+    Barrier.prototype.addToDeferredWithWait = function (action) {
+        var _this = this;
+        this.timeoutId = setTimeout(function () {
+            _this.addToDeferred(action);
+            _this.timeoutId = 0;
+        }, this.waitTime);
+    };
+    ;
+    return Barrier;
+}());
+;
+exports.default = Barrier;
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1889,207 +2037,51 @@ exports.default = cookie;
 
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var RequestExecutionError = (function () {
-    function RequestExecutionError(source) {
-        this.status = typeof (source.status) === 'number' ? source.status : 499;
-        this.statusText = typeof (source.statusText) === 'string' ? source.statusText : 'UNKNOWN';
-        this.message = typeof (source.responseText) === 'string' ? source.responseText :
-            (typeof (source.message) === 'string' ? source.message : 'Неизвестная ошибка');
-        this.message = this.processJson(this.message);
-    }
-    RequestExecutionError.prototype.processJson = function (message) {
-        var result = message;
-        try {
-            var mesObject = JSON.parse(message);
-            if (typeof (mesObject.error) === 'string') {
-                result = mesObject.error;
-            }
-            if (typeof (mesObject.error_description) === 'string') {
-                result = mesObject.error_description;
-            }
-        }
-        catch (e) {
-            //ignore
-        }
-        return result;
-    };
-    return RequestExecutionError;
-}());
-exports.default = RequestExecutionError;
-;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var tokenInfo_1 = __webpack_require__(14);
-var xhr_1 = __webpack_require__(5);
-var noop_1 = __webpack_require__(3);
-var cookieStorage_1 = __webpack_require__(2);
-var Auth = (function () {
-    function Auth(accessTokenKey, storage) {
-        this.accessTokenKey = accessTokenKey;
-        this.storage = storage;
-        this.accessTokenApiPath = '/token';
-        this.tokenInfoChangedHandlers = [];
-    }
-    Auth.prototype.requestNewAccessToken = function (login, password) {
-        var data = "grant_type=password&username=" + login + "&password=" + password;
-        var date = new Date();
-        var xhr = new xhr_1.default(this.accessTokenApiPath, 'POST', data);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
-        return xhr.execute().then(function (result) {
-            var info = new tokenInfo_1.default();
-            info.token = result.access_token;
-            info.login = login;
-            date.setSeconds(date.getSeconds() + result.expires_in);
-            info.expireDate = date;
-            return info;
-        });
-    };
-    Object.defineProperty(Auth.prototype, "accessTokenInfoKey", {
-        get: function () {
-            return this.accessTokenKey + "__tokenInfo";
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Auth.prototype.getTokenInfo = function () {
-        var tokenInfo = this.storage.get(this.accessTokenInfoKey);
-        if (!tokenInfo) {
-            return null;
-        }
-        return tokenInfo;
-    };
-    Auth.prototype.addAccessTokenToRequestHeader = function (xhr) {
-        var tokenInfo = this.getTokenInfo();
-        if (!tokenInfo) {
-            return xhr;
-        }
-        xhr.setRequestHeader('Authorization', "Bearer " + tokenInfo.token);
-        return xhr;
-    };
-    Auth.prototype.authorize = function (login, password) {
-        var _this = this;
-        return this.requestNewAccessToken(login, password).then(function (tokenInfo) {
-            _this.storage.set(_this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
-            _this.storage.setStr(_this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
-            _this.tokenInfoChanged(tokenInfo);
-            return tokenInfo;
-        });
-    };
-    Auth.prototype.clearTokenInfo = function () {
-        this.storage.remove(this.accessTokenInfoKey);
-        this.storage.remove(this.accessTokenKey);
-        this.tokenInfoChanged(null);
-    };
-    Auth.prototype.onTokenInfoChanged = function (handler) {
-        var _this = this;
-        if (!handler) {
-            return noop_1.default;
-        }
-        this.tokenInfoChangedHandlers.push(handler);
-        return function () {
-            var index = _this.tokenInfoChangedHandlers.indexOf(handler);
-            if (index > -1) {
-                _this.tokenInfoChangedHandlers.splice(index, 1);
-            }
-        };
-    };
-    Auth.prototype.tokenInfoChanged = function (newInfo) {
-        this.tokenInfoChangedHandlers.forEach(function (handler) { return handler(newInfo); });
-    };
-    Auth.prototype.setStorage = function (storage) {
-        this.storage = storage;
-    };
-    return Auth;
-}());
-exports.Auth = Auth;
-;
-var auth = new Auth('accessToken', cookieStorage_1.default);
-exports.default = auth;
-
-
-/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var xhr_1 = __webpack_require__(5);
-var serverConnection_1 = __webpack_require__(4);
-var json_1 = __webpack_require__(0);
-var BaseOperation = (function () {
-    function BaseOperation(name, data, requestType, requestMethod) {
-        this.requestUrl = '/api/operation';
-        this.name = name;
-        this.data = data;
-        this.requestMethod = requestMethod;
-        this.requestType = requestType;
+var noop_1 = __webpack_require__(2);
+var SyncActionsChain = (function () {
+    function SyncActionsChain() {
+        this.chain = [];
     }
-    BaseOperation.prototype.createXhr = function () {
-        var xhr = new xhr_1.default(this.requestUrl, this.requestMethod, this.data);
-        xhr.setRequestHeader('x-blades-operation-name', this.name);
-        xhr.setRequestHeader('x-blades-operation-request-type', this.requestType);
-        return xhr;
+    SyncActionsChain.prototype.addLast = function (item) {
+        return this.add(item, true);
     };
-    return BaseOperation;
-}());
-exports.default = BaseOperation;
-var JsonOperation = (function (_super) {
-    __extends(JsonOperation, _super);
-    function JsonOperation(name, data) {
+    SyncActionsChain.prototype.addFirst = function (item) {
+        return this.add(item, false);
+    };
+    SyncActionsChain.prototype.add = function (item, toEnd) {
         var _this = this;
-        var strData = json_1.default.stringify(data);
-        _this = _super.call(this, name, strData, 'json', 'POST') || this;
-        return _this;
-    }
-    JsonOperation.prototype.execute = function () {
-        var xhr = this.createXhr();
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        return xhr.execute();
-    };
-    JsonOperation.prototype.executeViaConnection = function () {
-        var message = {
-            name: this.name,
-            requestType: this.requestType,
-            data: this.data
+        if (typeof item !== 'function') {
+            return noop_1.default;
+        }
+        if (toEnd) {
+            this.chain.push(item);
+        }
+        else {
+            this.chain.unshift(item);
+        }
+        return function () {
+            var index = _this.chain.indexOf(item);
+            if (index > -1) {
+                _this.chain.splice(index, 1);
+            }
         };
-        var messageStr = this.requestType + "@@@@@" + this.name + "@@@@@" + this.data;
-        serverConnection_1.default.send(messageStr);
     };
-    return JsonOperation;
-}(BaseOperation));
-exports.JsonOperation = JsonOperation;
-var FormDataOperation = (function (_super) {
-    __extends(FormDataOperation, _super);
-    function FormDataOperation(name, data) {
-        return _super.call(this, name, data, 'FormDataOperation', 'POST') || this;
-    }
-    return FormDataOperation;
-}(BaseOperation));
-exports.FormDataOperation = FormDataOperation;
+    SyncActionsChain.prototype.run = function (data) {
+        for (var i = 0; i < this.chain.length; i++) {
+            data = this.chain[i](data);
+        }
+        return data;
+    };
+    return SyncActionsChain;
+}());
+;
+exports.default = SyncActionsChain;
 
 
 /***/ }),
@@ -2099,492 +2091,9 @@ exports.FormDataOperation = FormDataOperation;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var json_1 = __webpack_require__(0);
-var TokenInfo = (function () {
-    function TokenInfo() {
-    }
-    TokenInfo.fromJson = function (jsonStr) {
-        var obj = json_1.default.parse(jsonStr);
-        if (!obj) {
-            return null;
-        }
-        var result = new TokenInfo();
-        result.login = obj.login;
-        result.token = obj.token;
-        result.expireDate = new Date(obj.expireDate);
-        return result;
-    };
-    return TokenInfo;
-}());
-exports.default = TokenInfo;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var serverOperations_1 = __webpack_require__(13);
-var serverConnection_1 = __webpack_require__(4);
-var auth_1 = __webpack_require__(12);
-var Tuple = (function () {
-    function Tuple() {
-    }
-    return Tuple;
-}());
-var ComplexDataType = (function () {
-    function ComplexDataType() {
-    }
-    return ComplexDataType;
-}());
-describe('Xhr tests', function () {
-    beforeEach(function () {
-        auth_1.default.clearTokenInfo();
-    });
-    it('TestOperation.EchoOperation', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.EchoOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(5);
-            done();
-        }).catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.ComplexDataOperation', function (done) {
-        var data = new ComplexDataType();
-        data.someInt = -3;
-        data.someString = 'Тестовая строка';
-        data.someBool = false;
-        data.time = new Date();
-        data.listData = [{ item1: 5, item2: 'Abc', item3: true }, { item1: -5, item2: 'abC', item3: false }];
-        new serverOperations_1.JsonOperation('TestOperation.ComplexDataOperation', data).execute()
-            .then(function (result) {
-            expect(typeof (result.someInt)).toBe('number');
-            expect(result.someInt).toBe(-6);
-            expect(result.someString).toBe('ТЕСТОВАЯ СТРОКА');
-            expect(typeof (result.someBool)).toBe('boolean');
-            expect(result.someBool).toBe(true);
-            expect(typeof (result.time)).toBe('object');
-            expect(result.time.getHours()).toBe(data.time.getHours());
-            expect(result.time.getFullYear()).toBe(data.time.getFullYear() + 1);
-            expect(result.listData.length).toBe(2);
-            expect(result.listData[0].item1).toBe(4);
-            expect(result.listData[1].item2).toBe('abc');
-            done();
-        })
-            .catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation 0', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 0);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            console.error(err);
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation > 0', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(500);
-            expect(err.message).toBe('Data > 0');
-            done();
-        });
-    });
-    it('TestOperation.FailedOperation < 0', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', -5);
-        operation.execute().then(function (result) {
-            expect(result).toBe(0);
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(500);
-            expect(err.message).toBe('Data < 0');
-            done();
-        });
-    });
-    it('Login password good info test', function (done) {
-        auth_1.default.authorize('admin', 'w')
-            .then(function (data) {
-            expect(data.login).toBe('admin');
-            done();
-        })
-            .catch(function (err) {
-            expect(false).toBeTruthy();
-            done();
-        });
-    });
-    it('Login password bad info test', function (done) {
-        auth_1.default.authorize('admin', 'p')
-            .then(function (data) {
-            expect('').toBe('Попытка должна провалиться');
-            done();
-        })
-            .catch(function (err) {
-            expect(err.status).toBe(400);
-            expect(err.message).toBe("Неверный логин или пароль");
-            done();
-        });
-    });
-    it('TestOperation.AuthFailedOperation Bad scenario', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 5);
-        operation.execute().then(function (result) {
-            expect(result).toBe('Попытка должна провалиться');
-            done();
-        }).catch(function (err) {
-            expect(err.status).toBe(401);
-            expect(err.message).toBe('Пользователь не авторизован');
-            done();
-        });
-    });
-    it('TestOperation.AuthFailedOperation Good scenario', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 7);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe(7);
-                done();
-            }).catch(function (err) {
-                expect(false).toBeTruthy();
-                done();
-            });
-        });
-    });
-    it('TestOperation.PermissionedFailedOperation Bad scenario', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
-        auth_1.default.authorize('someUser', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe('Попытка должна провалиться');
-                done();
-            }).catch(function (err) {
-                expect(err.status).toBe(403);
-                expect(err.message).toBe("Пользователь someuser не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
-                done();
-            });
-        });
-    });
-    it('TestOperation.PermissionedFailedOperation Good scenario', function (done) {
-        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            operation.execute().then(function (result) {
-                expect(result).toBe(7);
-                done();
-            }).catch(function (err) {
-                expect(false).toBeTruthy();
-                done();
-            });
-        });
-    });
-    it('TestOperation.ChildrenTypesData', function (done) {
-        var baseType = { field1: 10 };
-        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
-        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
-        var operation0 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', baseType);
-        var operation1 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType1);
-        var operation2 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType2);
-        operation0.execute().then(function (result) {
-            expect(result).toBe(baseType.field1);
-            return operation1.execute();
-        }).then(function (result) {
-            expect(result).toBe(childType1.field1 + childType1.field2);
-            return operation2.execute();
-        }).then(function (result) {
-            expect(result).toBe(childType2.field1 - childType2.field2);
-            done();
-        });
-    });
-    it('TestOperation.ListOfChildrenTypes', function (done) {
-        var baseType = { field1: 10 };
-        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
-        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
-        var data = [baseType, childType1, childType2];
-        var operation = new serverOperations_1.JsonOperation('TestOperation.ListOfChildrenTypes', data);
-        operation.execute().then(function (results) {
-            expect(results.length).toBe(3);
-            expect(results[0]).toBe(baseType.field1);
-            expect(results[1]).toBe(childType1.field1 + childType1.field2);
-            expect(results[2]).toBe(childType2.field1 - childType2.field2);
-            done();
-        });
-    });
-});
-describe('Web socket connection Tests', function () {
-    it('TestOperation.WebSocketOperation; test 1', function (done) {
-        var data = new Tuple();
-        data.item1 = 4;
-        data.item2 = 'TesT';
-        data.item3 = new Date();
-        var operation = new serverOperations_1.JsonOperation('TestOperation.WebSocketOperation', data);
-        auth_1.default.authorize('admin', 'w').then(function () {
-            serverConnection_1.default.open();
-            operation.executeViaConnection();
-        });
-        serverConnection_1.default.onNotifyMessage('TestWsOp', function (newData) {
-            expect(newData.item1).toBe(8);
-            expect(newData.item2).toBe('test');
-            expect(newData.item3.getFullYear()).toBe(data.item3.getFullYear() + 5);
-            done();
-        });
-    });
-});
-
-
-/***/ }),
-/* 16 */,
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(7);
-__webpack_require__(6);
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-/* (ignored) */
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var barrier_1 = __webpack_require__(22);
-var syncActionsChain_1 = __webpack_require__(23);
-var asyncActionsChain_1 = __webpack_require__(24);
+var barrier_1 = __webpack_require__(11);
+var syncActionsChain_1 = __webpack_require__(13);
+var asyncActionsChain_1 = __webpack_require__(4);
 var es6_promise_1 = __webpack_require__(1);
 describe('Blades Tools tests', function () {
     describe('Barrier tests', function () {
@@ -2857,194 +2366,691 @@ function asyncActionsChainTests() {
 
 
 /***/ }),
-/* 22 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var es6_promise_1 = __webpack_require__(1);
-var Barrier = (function () {
-    function Barrier(waitTime) {
-        this.waitTime = waitTime;
-        this.timeoutId = 0;
-        this.deferred = null;
+var RequestExecutionError = (function () {
+    function RequestExecutionError(source) {
+        this.status = typeof (source.status) === 'number' ? source.status : 499;
+        this.statusText = typeof (source.statusText) === 'string' ? source.statusText : 'UNKNOWN';
+        this.message = typeof (source.responseText) === 'string' ? source.responseText :
+            (typeof (source.message) === 'string' ? source.message : 'Неизвестная ошибка');
+        this.message = this.processJson(this.message);
     }
-    Barrier.prototype.exec = function (action) {
-        if (this.timeoutId) {
-            this.cancelWaitAction();
+    RequestExecutionError.prototype.processJson = function (message) {
+        var result = message;
+        try {
+            var mesObject = JSON.parse(message);
+            if (typeof (mesObject.error) === 'string') {
+                result = mesObject.error;
+            }
+            if (typeof (mesObject.error_description) === 'string') {
+                result = mesObject.error_description;
+            }
         }
-        if (this.isWaitMode()) {
-            this.executeWaitAction(action);
+        catch (e) {
+            //ignore
         }
-        else {
-            action();
-        }
+        return result;
     };
-    Barrier.prototype.isWaitMode = function () {
-        return this.waitTime >= 0;
-    };
-    Barrier.prototype.cancelWaitAction = function () {
-        clearTimeout(this.timeoutId);
-        this.timeoutId = 0;
-    };
-    Barrier.prototype.executeWaitAction = function (action) {
-        var _this = this;
-        this.timeoutId = setTimeout(function () {
-            action();
-            _this.timeoutId = 0;
-        }, this.waitTime);
-    };
-    ;
-    Barrier.prototype.execAsync = function (action) {
-        if (this.timeoutId) {
-            this.cancelWaitAction();
-        }
-        if (this.isWaitMode()) {
-            this.addToDeferredWithWait(action);
-        }
-        else {
-            this.addToDeferred(action);
-        }
-    };
-    ;
-    Barrier.prototype.addToDeferred = function (action) {
-        if (this.deferred == null) {
-            this.deferred = new es6_promise_1.Promise(function (res, rej) {
-                action().then(res).catch(rej);
-            });
-        }
-        else {
-            this.deferred = this.deferred.then(function () {
-                return action();
-            });
-        }
-    };
-    ;
-    Barrier.prototype.addToDeferredWithWait = function (action) {
-        var _this = this;
-        this.timeoutId = setTimeout(function () {
-            _this.addToDeferred(action);
-            _this.timeoutId = 0;
-        }, this.waitTime);
-    };
-    ;
-    return Barrier;
+    return RequestExecutionError;
 }());
+exports.default = RequestExecutionError;
 ;
-exports.default = Barrier;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var tokenInfo_1 = __webpack_require__(18);
+var xhr_1 = __webpack_require__(6);
+var noop_1 = __webpack_require__(2);
+var cookieStorage_1 = __webpack_require__(3);
+var Auth = (function () {
+    function Auth(accessTokenKey, storage) {
+        this.accessTokenKey = accessTokenKey;
+        this.storage = storage;
+        this.accessTokenApiPath = '/token';
+        this.tokenInfoChangedHandlers = [];
+    }
+    Auth.prototype.requestNewAccessToken = function (login, password) {
+        var data = "grant_type=password&username=" + login + "&password=" + password;
+        var date = new Date();
+        var xhr = new xhr_1.default(this.accessTokenApiPath, 'POST', data);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+        return xhr.execute().then(function (result) {
+            var info = new tokenInfo_1.default();
+            info.token = result.access_token;
+            info.login = login;
+            date.setSeconds(date.getSeconds() + result.expires_in);
+            info.expireDate = date;
+            return info;
+        });
+    };
+    Object.defineProperty(Auth.prototype, "accessTokenInfoKey", {
+        get: function () {
+            return this.accessTokenKey + "__tokenInfo";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Auth.prototype.getTokenInfo = function () {
+        var tokenInfo = this.storage.get(this.accessTokenInfoKey);
+        if (!tokenInfo) {
+            return null;
+        }
+        return tokenInfo;
+    };
+    Auth.prototype.addAccessTokenToRequestHeader = function (xhr) {
+        var tokenInfo = this.getTokenInfo();
+        if (!tokenInfo) {
+            return xhr;
+        }
+        xhr.setRequestHeader('Authorization', "Bearer " + tokenInfo.token);
+        return xhr;
+    };
+    Auth.prototype.authorize = function (login, password) {
+        var _this = this;
+        return this.requestNewAccessToken(login, password).then(function (tokenInfo) {
+            _this.storage.set(_this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
+            _this.storage.setStr(_this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
+            _this.tokenInfoChanged(tokenInfo);
+            return tokenInfo;
+        });
+    };
+    Auth.prototype.clearTokenInfo = function () {
+        this.storage.remove(this.accessTokenInfoKey);
+        this.storage.remove(this.accessTokenKey);
+        this.tokenInfoChanged(null);
+    };
+    Auth.prototype.onTokenInfoChanged = function (handler) {
+        var _this = this;
+        if (!handler) {
+            return noop_1.default;
+        }
+        this.tokenInfoChangedHandlers.push(handler);
+        return function () {
+            var index = _this.tokenInfoChangedHandlers.indexOf(handler);
+            if (index > -1) {
+                _this.tokenInfoChangedHandlers.splice(index, 1);
+            }
+        };
+    };
+    Auth.prototype.tokenInfoChanged = function (newInfo) {
+        this.tokenInfoChangedHandlers.forEach(function (handler) { return handler(newInfo); });
+    };
+    Auth.prototype.setStorage = function (storage) {
+        this.storage = storage;
+    };
+    return Auth;
+}());
+exports.Auth = Auth;
+;
+var auth = new Auth('accessToken', cookieStorage_1.default);
+exports.default = auth;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var xhr_1 = __webpack_require__(6);
+var serverConnection_1 = __webpack_require__(5);
+var json_1 = __webpack_require__(0);
+var BaseOperation = (function () {
+    function BaseOperation(name, data, requestType, requestMethod) {
+        this.requestUrl = '/api/operation';
+        this.name = name;
+        this.data = data;
+        this.requestMethod = requestMethod;
+        this.requestType = requestType;
+    }
+    BaseOperation.prototype.createXhr = function () {
+        var xhr = new xhr_1.default(this.requestUrl, this.requestMethod, this.data);
+        xhr.setRequestHeader('x-blades-operation-name', this.name);
+        xhr.setRequestHeader('x-blades-operation-request-type', this.requestType);
+        return xhr;
+    };
+    return BaseOperation;
+}());
+exports.default = BaseOperation;
+var JsonOperation = (function (_super) {
+    __extends(JsonOperation, _super);
+    function JsonOperation(name, data) {
+        var _this = this;
+        var strData = json_1.default.stringify(data);
+        _this = _super.call(this, name, strData, 'json', 'POST') || this;
+        return _this;
+    }
+    JsonOperation.prototype.execute = function () {
+        var xhr = this.createXhr();
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        return xhr.execute();
+    };
+    JsonOperation.prototype.executeViaConnection = function () {
+        var message = {
+            name: this.name,
+            requestType: this.requestType,
+            data: this.data
+        };
+        var messageStr = this.requestType + "@@@@@" + this.name + "@@@@@" + this.data;
+        serverConnection_1.default.send(messageStr);
+    };
+    return JsonOperation;
+}(BaseOperation));
+exports.JsonOperation = JsonOperation;
+var FormDataOperation = (function (_super) {
+    __extends(FormDataOperation, _super);
+    function FormDataOperation(name, data) {
+        return _super.call(this, name, data, 'FormDataOperation', 'POST') || this;
+    }
+    return FormDataOperation;
+}(BaseOperation));
+exports.FormDataOperation = FormDataOperation;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var json_1 = __webpack_require__(0);
+var TokenInfo = (function () {
+    function TokenInfo() {
+    }
+    TokenInfo.fromJson = function (jsonStr) {
+        var obj = json_1.default.parse(jsonStr);
+        if (!obj) {
+            return null;
+        }
+        var result = new TokenInfo();
+        result.login = obj.login;
+        result.token = obj.token;
+        result.expireDate = new Date(obj.expireDate);
+        return result;
+    };
+    return TokenInfo;
+}());
+exports.default = TokenInfo;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var serverOperations_1 = __webpack_require__(17);
+var serverConnection_1 = __webpack_require__(5);
+var auth_1 = __webpack_require__(16);
+var Tuple = (function () {
+    function Tuple() {
+    }
+    return Tuple;
+}());
+var ComplexDataType = (function () {
+    function ComplexDataType() {
+    }
+    return ComplexDataType;
+}());
+describe('Xhr tests', function () {
+    beforeEach(function () {
+        auth_1.default.clearTokenInfo();
+    });
+    it('TestOperation.EchoOperation', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.EchoOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(5);
+            done();
+        }).catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.ComplexDataOperation', function (done) {
+        var data = new ComplexDataType();
+        data.someInt = -3;
+        data.someString = 'Тестовая строка';
+        data.someBool = false;
+        data.time = new Date();
+        data.listData = [{ item1: 5, item2: 'Abc', item3: true }, { item1: -5, item2: 'abC', item3: false }];
+        new serverOperations_1.JsonOperation('TestOperation.ComplexDataOperation', data).execute()
+            .then(function (result) {
+            expect(typeof (result.someInt)).toBe('number');
+            expect(result.someInt).toBe(-6);
+            expect(result.someString).toBe('ТЕСТОВАЯ СТРОКА');
+            expect(typeof (result.someBool)).toBe('boolean');
+            expect(result.someBool).toBe(true);
+            expect(typeof (result.time)).toBe('object');
+            expect(result.time.getHours()).toBe(data.time.getHours());
+            expect(result.time.getFullYear()).toBe(data.time.getFullYear() + 1);
+            expect(result.listData.length).toBe(2);
+            expect(result.listData[0].item1).toBe(4);
+            expect(result.listData[1].item2).toBe('abc');
+            done();
+        })
+            .catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 0);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            console.error(err);
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation > 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(500);
+            expect(err.message).toBe('Data > 0');
+            done();
+        });
+    });
+    it('TestOperation.FailedOperation < 0', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.FailedOperation', -5);
+        operation.execute().then(function (result) {
+            expect(result).toBe(0);
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(500);
+            expect(err.message).toBe('Data < 0');
+            done();
+        });
+    });
+    it('Login password good info test', function (done) {
+        auth_1.default.authorize('admin', 'w')
+            .then(function (data) {
+            expect(data.login).toBe('admin');
+            done();
+        })
+            .catch(function (err) {
+            expect(false).toBeTruthy();
+            done();
+        });
+    });
+    it('Login password bad info test', function (done) {
+        auth_1.default.authorize('admin', 'p')
+            .then(function (data) {
+            expect('').toBe('Попытка должна провалиться');
+            done();
+        })
+            .catch(function (err) {
+            expect(err.status).toBe(400);
+            expect(err.message).toBe("Неверный логин или пароль");
+            done();
+        });
+    });
+    it('TestOperation.AuthFailedOperation Bad scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 5);
+        operation.execute().then(function (result) {
+            expect(result).toBe('Попытка должна провалиться');
+            done();
+        }).catch(function (err) {
+            expect(err.status).toBe(401);
+            expect(err.message).toBe('Пользователь не авторизован');
+            done();
+        });
+    });
+    it('TestOperation.AuthFailedOperation Good scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.AuthFailedOperation', 7);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe(7);
+                done();
+            }).catch(function (err) {
+                expect(false).toBeTruthy();
+                done();
+            });
+        });
+    });
+    it('TestOperation.PermissionedFailedOperation Bad scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
+        auth_1.default.authorize('someUser', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe('Попытка должна провалиться');
+                done();
+            }).catch(function (err) {
+                expect(err.status).toBe(403);
+                expect(err.message).toBe("Пользователь someuser не имеет прав: Update, Delete, на ресурс: Тестовый тип --- Тестовый объект");
+                done();
+            });
+        });
+    });
+    it('TestOperation.PermissionedFailedOperation Good scenario', function (done) {
+        var operation = new serverOperations_1.JsonOperation('TestOperation.PermissionedFailedOperation', 7);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            operation.execute().then(function (result) {
+                expect(result).toBe(7);
+                done();
+            }).catch(function (err) {
+                expect(false).toBeTruthy();
+                done();
+            });
+        });
+    });
+    it('TestOperation.ChildrenTypesData', function (done) {
+        var baseType = { field1: 10 };
+        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        var operation0 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', baseType);
+        var operation1 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType1);
+        var operation2 = new serverOperations_1.JsonOperation('TestOperation.ChildrenTypesData', childType2);
+        operation0.execute().then(function (result) {
+            expect(result).toBe(baseType.field1);
+            return operation1.execute();
+        }).then(function (result) {
+            expect(result).toBe(childType1.field1 + childType1.field2);
+            return operation2.execute();
+        }).then(function (result) {
+            expect(result).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
+    it('TestOperation.ListOfChildrenTypes', function (done) {
+        var baseType = { field1: 10 };
+        var childType1 = { $type: '38ADA025-A94F-486E-AEEF-55E61F951CF8, guid', field1: 10, field2: 5 };
+        var childType2 = { $type: 'A670EBC8-29D8-44DD-8D23-C08BAE68F218, guid', field1: 10, field2: 5 };
+        var data = [baseType, childType1, childType2];
+        var operation = new serverOperations_1.JsonOperation('TestOperation.ListOfChildrenTypes', data);
+        operation.execute().then(function (results) {
+            expect(results.length).toBe(3);
+            expect(results[0]).toBe(baseType.field1);
+            expect(results[1]).toBe(childType1.field1 + childType1.field2);
+            expect(results[2]).toBe(childType2.field1 - childType2.field2);
+            done();
+        });
+    });
+});
+describe('Web socket connection Tests', function () {
+    it('TestOperation.WebSocketOperation; test 1', function (done) {
+        var data = new Tuple();
+        data.item1 = 4;
+        data.item2 = 'TesT';
+        data.item3 = new Date();
+        var operation = new serverOperations_1.JsonOperation('TestOperation.WebSocketOperation', data);
+        auth_1.default.authorize('admin', 'w').then(function () {
+            serverConnection_1.default.open();
+            operation.executeViaConnection();
+        });
+        serverConnection_1.default.onNotifyMessage('TestWsOp', function (newData) {
+            expect(newData.item1).toBe(8);
+            expect(newData.item2).toBe('test');
+            expect(newData.item3.getFullYear()).toBe(data.item3.getFullYear() + 5);
+            done();
+        });
+    });
+});
+
+
+/***/ }),
+/* 20 */,
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(8);
+__webpack_require__(7);
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 
 /***/ }),
 /* 23 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
+var g;
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var noop_1 = __webpack_require__(3);
-var SyncActionsChain = (function () {
-    function SyncActionsChain() {
-        this.chain = [];
-    }
-    SyncActionsChain.prototype.addLast = function (item) {
-        return this.add(item, true);
-    };
-    SyncActionsChain.prototype.addFirst = function (item) {
-        return this.add(item, false);
-    };
-    SyncActionsChain.prototype.add = function (item, toEnd) {
-        var _this = this;
-        if (typeof item !== 'function') {
-            return noop_1.default;
-        }
-        if (toEnd) {
-            this.chain.push(item);
-        }
-        else {
-            this.chain.unshift(item);
-        }
-        return function () {
-            var index = _this.chain.indexOf(item);
-            if (index > -1) {
-                _this.chain.splice(index, 1);
-            }
-        };
-    };
-    SyncActionsChain.prototype.run = function (data) {
-        for (var i = 0; i < this.chain.length; i++) {
-            data = this.chain[i](data);
-        }
-        return data;
-    };
-    return SyncActionsChain;
-}());
-;
-exports.default = SyncActionsChain;
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
 /* 24 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var noop_1 = __webpack_require__(3);
-var AsyncActionsChain = (function () {
-    function AsyncActionsChain() {
-        this.chain = [];
-        this.asyncAction = this.buildChain();
-    }
-    AsyncActionsChain.prototype.addLast = function (item) {
-        return this.add(item, true);
-    };
-    AsyncActionsChain.prototype.addFirst = function (item) {
-        return this.add(item, false);
-    };
-    AsyncActionsChain.prototype.add = function (item, toEnd) {
-        var _this = this;
-        if (typeof item !== 'function') {
-            return noop_1.default;
-        }
-        if (toEnd) {
-            this.chain.push(item);
-        }
-        else {
-            this.chain.unshift(item);
-        }
-        this.asyncAction = this.buildChain();
-        return function () {
-            var index = _this.chain.indexOf(item);
-            if (index > -1) {
-                _this.chain.splice(index, 1);
-                _this.asyncAction = _this.buildChain();
-            }
-        };
-    };
-    AsyncActionsChain.prototype.run = function (data) {
-        return this.asyncAction(data);
-    };
-    AsyncActionsChain.prototype.buildChain = function () {
-        var _this = this;
-        var action = noop_1.echoPromise;
-        if (this.chain.length === 0) {
-            return action;
-        }
-        var _loop_1 = function (i) {
-            var oldAction = action;
-            action = (function (data) { return oldAction(data).then(_this.chain[i]); });
-        };
-        for (var i = 0; i < this.chain.length; i++) {
-            _loop_1(i);
-        }
-        return action;
-    };
-    return AsyncActionsChain;
-}());
-;
-exports.default = AsyncActionsChain;
-
+/* (ignored) */
 
 /***/ })
 /******/ ]);

@@ -3,9 +3,11 @@
 const noop = () => { };
 export default noop;
 
-export const echo = (data: any) => data;
+export function echo(data: any): any {
+    return data;
+};
 
-export const echoPromise = (data: any) => {
+export function echoPromise(data: any) : any {
     return new Promise((res, rej) => {
         res(data);
     });

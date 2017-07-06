@@ -49,7 +49,7 @@ class AsyncActionsChain<T> {
 
 
     private buildChain(): (data: T) => Promise<T> {
-        let action = echoPromise;
+        let action = (<(d: T) => Promise<T>>echoPromise);
         if (this.chain.length === 0) {
             return action;
         }
