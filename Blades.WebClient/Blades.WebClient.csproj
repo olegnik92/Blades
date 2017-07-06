@@ -90,6 +90,7 @@
     <TypeScriptCompile Include="clientModules\blades\jasmine\ownTest.ts" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Blades.WebClient.nuspec" />
     <None Include="nuget_pack.cmd" />
   </ItemGroup>

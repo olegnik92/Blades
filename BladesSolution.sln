@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades.Commands", "Blades.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades.WebClient", "Blades.WebClient\Blades.WebClient.csproj", "{9916D2BA-12CE-4CA5-B3D8-D69981F506F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BladesExStartup", "BladesExStartup\BladesExStartup.csproj", "{10B3587C-ED30-43D6-881E-EB03F979E9D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BladesEx.Startup", "BladesEx.Startup\BladesEx.Startup.csproj", "{475E55A7-F01A-40A7-866A-6BAB69C79D61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,14 @@ Global
 		{9916D2BA-12CE-4CA5-B3D8-D69981F506F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9916D2BA-12CE-4CA5-B3D8-D69981F506F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9916D2BA-12CE-4CA5-B3D8-D69981F506F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10B3587C-ED30-43D6-881E-EB03F979E9D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10B3587C-ED30-43D6-881E-EB03F979E9D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10B3587C-ED30-43D6-881E-EB03F979E9D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10B3587C-ED30-43D6-881E-EB03F979E9D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{475E55A7-F01A-40A7-866A-6BAB69C79D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{475E55A7-F01A-40A7-866A-6BAB69C79D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{475E55A7-F01A-40A7-866A-6BAB69C79D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{475E55A7-F01A-40A7-866A-6BAB69C79D61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
