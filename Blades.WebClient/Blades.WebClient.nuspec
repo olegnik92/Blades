@@ -14,7 +14,6 @@
 
   <files>
     <file src="clientModules\blades\**.ts" target="content\clientModules\blades" exclude="**\node_modules\**" />
-    <file src="clientModules\@types\" target="content\clientModules\@types" />
-    <file src="clientModules\jasmine\" target="content\clientModules\jasmine" />
+    <file src="clientModules\blades\jasmine\" target="content\clientModules\blades\jasmine" />
   </files>
 </package>

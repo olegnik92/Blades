@@ -1686,18 +1686,6 @@ exports.default = Xhr;
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(14);
-__webpack_require__(10);
-__webpack_require__(19);
-
-
-/***/ }),
-/* 8 */
 /***/ (function(module, exports) {
 
 describe('Jasmine own tests', function () {
@@ -1710,6 +1698,18 @@ describe('Jasmine own tests', function () {
         expect(2).toBe(2);
     });
 });
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(14);
+__webpack_require__(10);
+__webpack_require__(19);
 
 
 /***/ }),
@@ -2825,8 +2825,8 @@ describe('Web socket connection Tests', function () {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(8);
 __webpack_require__(7);
+__webpack_require__(8);
 
 
 /***/ }),

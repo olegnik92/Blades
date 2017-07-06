@@ -1,2 +1,2 @@
-﻿import 'jasmine/ownTest';
+﻿import 'blades/jasmine/ownTest';
 import 'blades/unitTests';
