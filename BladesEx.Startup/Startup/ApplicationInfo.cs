@@ -23,6 +23,8 @@ namespace BladesEx.Startup
 
         public DataBaseConfig DataBase { get; set; }
 
+        public FileServerConfig FileServer { get; set; } = new FileServerConfig();
+
         public string ToClientJson()
         {
             return $"{{\"name\":\"{Name}\", \"title\":\"{Title}\",  \"configuration\":\"{Configuration}\",  \"version\":\"{Version}\"}}";

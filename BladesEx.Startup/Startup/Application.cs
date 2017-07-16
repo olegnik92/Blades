@@ -26,7 +26,7 @@ namespace BladesEx.Startup
 
             if (appInfo.HostType == HostType.ConsoleSelfHost)
             {
-                FileServerConfig(appBuilder);
+                FileServerConfig(appBuilder, appInfo.FileServer);
             }
 
             var authManager = ((IBladesServiceLocator)activator).GetInstance<IAuthManager>();
@@ -39,9 +39,9 @@ namespace BladesEx.Startup
             Blades.Web.StartupHelper.InitClientsConnection(appBuilder, activator);
         }
 
-        private static void FileServerConfig(IAppBuilder appBuilder)
+        private static void FileServerConfig(IAppBuilder appBuilder, FileServerConfig config)
         {
-            var physicalFileSystem = new PhysicalFileSystem(@".\public");
+            var physicalFileSystem = new PhysicalFileSystem(config.PublicRootPath);
             var options = new FileServerOptions
             {
                 EnableDefaultFiles = true,
@@ -49,7 +49,7 @@ namespace BladesEx.Startup
             };
             options.StaticFileOptions.FileSystem = physicalFileSystem;
             options.StaticFileOptions.ServeUnknownFileTypes = true;
-            options.DefaultFilesOptions.DefaultFileNames = new[] { "index.html" };
+            options.DefaultFilesOptions.DefaultFileNames = new[] { config.DefaultPublicFileName };
             appBuilder.UseFileServer(options);
         }
     }

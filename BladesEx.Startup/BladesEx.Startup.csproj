@@ -110,6 +110,7 @@
     <Compile Include="Startup\Application.cs" />
     <Compile Include="Startup\ApplicationInfo.cs" />
     <Compile Include="Startup\DataBaseConfig.cs" />
+    <Compile Include="Startup\FileServerConfig.cs" />
     <Compile Include="Startup\HostType.cs" />
   </ItemGroup>
   <ItemGroup>
