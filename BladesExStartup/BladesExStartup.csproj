@@ -79,10 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Nuget_pack_all.cmd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="public\index.html" />
+    <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BladesEx.Startup\BladesEx.Startup.csproj">
