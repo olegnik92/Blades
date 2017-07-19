@@ -1,7 +1,10 @@
-﻿using Blades.Auth.Interfaces;
+﻿using Blades.Auth.Basis;
+using Blades.Auth.Interfaces;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
+using Owin.Security.AesDataProtectorProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +37,7 @@ namespace Blades.Auth
             // Token Generation
             appBuilder.UseOAuthAuthorizationServer(oAuthServerOptions);
             appBuilder.UseOAuthBearerAuthentication(oAuthBearerOptions);
+            appBuilder.UseAesDataProtectorProvider();
         }
     }
 }
