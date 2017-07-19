@@ -1,9 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_1 = require("../tools/json");
 var noop_1 = require("../tools/noop");
 var ServerConnection = (function () {
     function ServerConnection() {
-        this.connectionProtocol = 'ws';
+        this.connectionProtocol = 'ws'; //or wss
         this.connectionRoute = 'ws';
         this.reconnectTimeout = 15000;
         this.reconnectIntervalRef = 0;
@@ -100,6 +101,7 @@ var ServerConnection = (function () {
             }
         }
         catch (e) {
+            //ignore
         }
     };
     ServerConnection.prototype.onNotifyMessage = function (name, handler) {
@@ -122,5 +124,5 @@ var ServerConnection = (function () {
 }());
 exports.ServerConnection = ServerConnection;
 var connection = new ServerConnection();
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = connection;
+//# sourceMappingURL=serverConnection.js.map

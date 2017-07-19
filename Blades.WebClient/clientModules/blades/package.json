@@ -9,7 +9,5 @@
   "author": "NOY",
   "license": "ISC",
   "dependencies": {
-    "@types/es6-promise": "0.0.32",
-    "es6-promise": "^4.0.5"
   }
 }

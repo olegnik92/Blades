@@ -1,10 +1,9 @@
-﻿import { Promise } from 'es6-promise';
-
+﻿
 
 class Barrier {
 
     private timeoutId: number = 0;
-    private deferred: Promise<any> = null;
+    private deferred: Promise<any> | null = null;
     public constructor(private waitTime: number) {
 
     }

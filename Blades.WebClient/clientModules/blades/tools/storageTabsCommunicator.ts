@@ -49,7 +49,7 @@
 
         window.addEventListener('storage', (e: StorageEvent) => {
             if (e.key === this.communicationItemKey) {
-                let data = JSON.parse(e.newValue).data;
+                let data = JSON.parse(e.newValue || "{}").data;
                 this.fireReceiveDataHandlers(data);
             } else if (e.key === this.tabFocusEventKey) {
                 this.isActive = false;
@@ -60,8 +60,8 @@
     }
 
 
-    private static inst: StorageTabsCommunicator = null;
-    public static get instance() {
+    private static inst: StorageTabsCommunicator | null = null;
+    public static get instance() : StorageTabsCommunicator {
         if (StorageTabsCommunicator.inst == null) {
             StorageTabsCommunicator.inst = new StorageTabsCommunicator('');
         }

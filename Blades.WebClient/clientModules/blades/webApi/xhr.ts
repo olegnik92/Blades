@@ -1,5 +1,4 @@
-﻿import { Promise } from 'es6-promise';
-import json from '../tools/json';
+﻿import json from '../tools/json';
 import RequestExecutionError from './RequestExecutionError';
 import AsyncActionsChain from '../tools/asyncActionsChain';
 

@@ -1,7 +1,6 @@
 ﻿
 import { JsonOperation } from '../serverOperations';
 import RequestExecutionError from '../requestExecutionError';
-import { Promise } from 'es6-promise';
 import connection from '../serverConnection';
 import auth from '../auth';
 

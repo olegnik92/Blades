@@ -1,7 +1,8 @@
 "use strict";
-var es6_promise_1 = require("es6-promise");
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_1 = require("../tools/json");
 var RequestExecutionError_1 = require("./RequestExecutionError");
+var asyncActionsChain_1 = require("../tools/asyncActionsChain");
 var Xhr = (function () {
     function Xhr(url, method, body) {
         if (method === void 0) { method = 'GET'; }
@@ -58,7 +59,7 @@ var Xhr = (function () {
     };
     Xhr.prototype.rawExecute = function () {
         var _this = this;
-        return new es6_promise_1.Promise(function (res, rej) {
+        return new Promise(function (res, rej) {
             _this.xhr.send(_this.reqBody);
             _this.xhr.onreadystatechange = (function () {
                 if (_this.xhr.readyState !== XMLHttpRequest.DONE) {
@@ -71,14 +72,20 @@ var Xhr = (function () {
             });
         });
     };
-    Xhr.beforeExecution = function (hook) {
-        var next = Xhr.beforeExecutionChain;
-        Xhr.beforeExecutionChain = (function (xhr) { return hook(xhr).then(next); });
-    };
-    Xhr.afterExecution = function (hook) {
-        var next = Xhr.afterExecutionChain;
-        Xhr.afterExecutionChain = (function (xhr) { return hook(xhr).then(next); });
-    };
+    Object.defineProperty(Xhr, "beforeExecChain", {
+        get: function () {
+            return Xhr.beforeExecutionChain;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Xhr, "afterExecChain", {
+        get: function () {
+            return Xhr.afterExecutionChain;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Xhr.createResData = function (xhr) {
         if (xhr.readyState !== XMLHttpRequest.DONE) {
             throw new Error('Try to parse XHR in incorrect state');
@@ -88,10 +95,10 @@ var Xhr = (function () {
     };
     Xhr.prototype.execute = function () {
         var _this = this;
-        return new es6_promise_1.Promise(function (res, rej) {
-            Xhr.beforeExecutionChain(_this)
+        return new Promise(function (res, rej) {
+            Xhr.beforeExecutionChain.run(_this)
                 .then(function (xhr) { return xhr.rawExecute(); })
-                .then(function (xhr) { return Xhr.afterExecutionChain(xhr); })
+                .then(function (xhr) { return Xhr.afterExecutionChain.run(xhr); })
                 .then(function (xhr) {
                 if (xhr.status !== 200) {
                     rej(new RequestExecutionError_1.default(xhr));
@@ -103,9 +110,9 @@ var Xhr = (function () {
                 .catch(function (err) { return rej(new RequestExecutionError_1.default(err)); });
         });
     };
+    Xhr.beforeExecutionChain = new asyncActionsChain_1.default();
+    Xhr.afterExecutionChain = new asyncActionsChain_1.default();
     return Xhr;
 }());
-Xhr.beforeExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
-Xhr.afterExecutionChain = function (xhr) { return new es6_promise_1.Promise(function (res) { return res(xhr); }); };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Xhr;
+//# sourceMappingURL=xhr.js.map

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var RequestExecutionError = (function () {
     function RequestExecutionError(source) {
         this.status = typeof (source.status) === 'number' ? source.status : 499;
@@ -19,11 +20,12 @@ var RequestExecutionError = (function () {
             }
         }
         catch (e) {
+            //ignore
         }
         return result;
     };
     return RequestExecutionError;
 }());
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = RequestExecutionError;
 ;
+//# sourceMappingURL=RequestExecutionError.js.map

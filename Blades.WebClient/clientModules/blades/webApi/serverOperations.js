@@ -1,9 +1,15 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var xhr_1 = require("./xhr");
 var serverConnection_1 = require("./serverConnection");
 var json_1 = require("../tools/json");
@@ -23,13 +29,13 @@ var BaseOperation = (function () {
     };
     return BaseOperation;
 }());
-exports.BaseOperation = BaseOperation;
+exports.default = BaseOperation;
 var JsonOperation = (function (_super) {
     __extends(JsonOperation, _super);
     function JsonOperation(name, data) {
-        var _this;
+        var _this = this;
         var strData = json_1.default.stringify(data);
-        _this = _super.call(this, name, strData, 'JsonOperation', 'POST') || this;
+        _this = _super.call(this, name, strData, 'json', 'POST') || this;
         return _this;
     }
     JsonOperation.prototype.execute = function () {
@@ -48,8 +54,7 @@ var JsonOperation = (function (_super) {
     };
     return JsonOperation;
 }(BaseOperation));
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = JsonOperation;
+exports.JsonOperation = JsonOperation;
 var FormDataOperation = (function (_super) {
     __extends(FormDataOperation, _super);
     function FormDataOperation(name, data) {
@@ -58,3 +63,4 @@ var FormDataOperation = (function (_super) {
     return FormDataOperation;
 }(BaseOperation));
 exports.FormDataOperation = FormDataOperation;
+//# sourceMappingURL=serverOperations.js.map

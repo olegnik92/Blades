@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var StorageTabsCommunicator = (function () {
     function StorageTabsCommunicator(id) {
         var _this = this;
@@ -13,7 +14,7 @@ var StorageTabsCommunicator = (function () {
         });
         window.addEventListener('storage', function (e) {
             if (e.key === _this.communicationItemKey) {
-                var data = JSON.parse(e.newValue).data;
+                var data = JSON.parse(e.newValue || "{}").data;
                 _this.fireReceiveDataHandlers(data);
             }
             else if (e.key === _this.tabFocusEventKey) {
@@ -56,10 +57,10 @@ var StorageTabsCommunicator = (function () {
         enumerable: true,
         configurable: true
     });
+    StorageTabsCommunicator.inst = null;
     return StorageTabsCommunicator;
 }());
-StorageTabsCommunicator.inst = null;
 exports.StorageTabsCommunicator = StorageTabsCommunicator;
 var storageTabsCommunicator = StorageTabsCommunicator.instance;
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = storageTabsCommunicator;
+//# sourceMappingURL=storageTabsCommunicator.js.map

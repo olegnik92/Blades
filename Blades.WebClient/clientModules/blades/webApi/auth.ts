@@ -1,7 +1,7 @@
-﻿import { Promise } from 'es6-promise';
-import TokenInfo from './tokenInfo';
+﻿import TokenInfo from './tokenInfo';
 import Xhr from './xhr';
 import noop from '../tools/noop';
+import SyncActionsChain from '../tools/syncActionsChain';
 import ITempStorage from '../storages/tempStorage';
 import cookieStorage from '../storages/cookieStorage';
 
@@ -32,7 +32,7 @@ export class Auth {
         return `${this.accessTokenKey}__tokenInfo`;
     }
 
-    public getTokenInfo(): TokenInfo {
+    public getTokenInfo(): TokenInfo | null {
         const tokenInfo = <TokenInfo>this.storage.get(this.accessTokenInfoKey);
         if (!tokenInfo) {
             return null;
@@ -54,7 +54,7 @@ export class Auth {
         return this.requestNewAccessToken(login, password).then((tokenInfo: TokenInfo) => {
             this.storage.set(this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
             this.storage.setStr(this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
-            this.tokenInfoChanged(tokenInfo);
+            this.tokenInfoChanged.run(tokenInfo);
             return tokenInfo;
         });
     }
@@ -62,28 +62,11 @@ export class Auth {
     public clearTokenInfo(): void {
         this.storage.remove(this.accessTokenInfoKey);
         this.storage.remove(this.accessTokenKey);
-        this.tokenInfoChanged(null);
+        this.tokenInfoChanged.run(null);
     }
 
 
-    private tokenInfoChangedHandlers: Array<(info: TokenInfo) => void> = [];
-    public onTokenInfoChanged(handler: (info: TokenInfo) => void): () => void {
-        if (!handler) {
-            return noop;
-        }
-
-        this.tokenInfoChangedHandlers.push(handler);
-        return () => {
-            let index = this.tokenInfoChangedHandlers.indexOf(handler);
-            if (index > -1) {
-                this.tokenInfoChangedHandlers.splice(index, 1);
-            }
-        };
-    }
-
-    private tokenInfoChanged(newInfo: TokenInfo): void {
-        this.tokenInfoChangedHandlers.forEach(handler => handler(newInfo));
-    }
+    private tokenInfoChanged: SyncActionsChain<TokenInfo | null> = new SyncActionsChain<TokenInfo | null>();
 
 
     public setStorage(storage: ITempStorage): void {

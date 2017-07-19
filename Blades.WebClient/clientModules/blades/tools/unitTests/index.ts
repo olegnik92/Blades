@@ -1,7 +1,7 @@
 ﻿import Barrier from '../barrier';
 import SyncActionsChain from '../syncActionsChain';
 import AsyncActionsChain from '../asyncActionsChain';
-import { Promise } from 'es6-promise';
+import '../../jasmine';
 
 describe('Blades Tools tests', () => {
 

@@ -1,22 +1,23 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var tokenInfo_1 = require("./tokenInfo");
 var xhr_1 = require("./xhr");
-var noop_1 = require("../tools/noop");
-var cookie_1 = require("../tools/cookie");
+var syncActionsChain_1 = require("../tools/syncActionsChain");
+var cookieStorage_1 = require("../storages/cookieStorage");
 var Auth = (function () {
-    function Auth(accessTokenInfoStorageKey, accessTokenCookieName) {
-        this.accessTokenPath = '/token';
-        this.tokenInfoChangedHandlers = [];
-        this.accessTokenInfoStorageKey = accessTokenInfoStorageKey;
-        this.accessTokenCookieName = accessTokenCookieName;
+    function Auth(accessTokenKey, storage) {
+        this.accessTokenKey = accessTokenKey;
+        this.storage = storage;
+        this.accessTokenApiPath = '/token';
+        this.tokenInfoChanged = new syncActionsChain_1.default();
     }
     Auth.prototype.requestNewAccessToken = function (login, password) {
         var data = "grant_type=password&username=" + login + "&password=" + password;
         var date = new Date();
-        var xhr = new xhr_1.Xhr(this.accessTokenPath, 'POST', data);
+        var xhr = new xhr_1.default(this.accessTokenApiPath, 'POST', data);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
         return xhr.execute().then(function (result) {
-            var info = new tokenInfo_1.TokenInfo();
+            var info = new tokenInfo_1.default();
             info.token = result.access_token;
             info.login = login;
             date.setSeconds(date.getSeconds() + result.expires_in);
@@ -24,12 +25,18 @@ var Auth = (function () {
             return info;
         });
     };
+    Object.defineProperty(Auth.prototype, "accessTokenInfoKey", {
+        get: function () {
+            return this.accessTokenKey + "__tokenInfo";
+        },
+        enumerable: true,
+        configurable: true
+    });
     Auth.prototype.getTokenInfo = function () {
-        var tokenInfoJson = localStorage.getItem(this.accessTokenInfoStorageKey);
-        if (!tokenInfoJson) {
+        var tokenInfo = this.storage.get(this.accessTokenInfoKey);
+        if (!tokenInfo) {
             return null;
         }
-        var tokenInfo = tokenInfo_1.TokenInfo.fromJson(tokenInfoJson);
         return tokenInfo;
     };
     Auth.prototype.addAccessTokenToRequestHeader = function (xhr) {
@@ -43,37 +50,24 @@ var Auth = (function () {
     Auth.prototype.authorize = function (login, password) {
         var _this = this;
         return this.requestNewAccessToken(login, password).then(function (tokenInfo) {
-            localStorage.setItem(_this.accessTokenInfoStorageKey, tokenInfo.toJson());
-            cookie_1.default.setCookie(_this.accessTokenCookieName, tokenInfo.token, new cookie_1.CookieOptions(tokenInfo.expireDate));
-            _this.tokenInfoChanged(tokenInfo);
+            _this.storage.set(_this.accessTokenInfoKey, tokenInfo, tokenInfo.expireDate);
+            _this.storage.setStr(_this.accessTokenKey, tokenInfo.token, tokenInfo.expireDate);
+            _this.tokenInfoChanged.run(tokenInfo);
             return tokenInfo;
         });
     };
     Auth.prototype.clearTokenInfo = function () {
-        localStorage.removeItem(this.accessTokenInfoStorageKey);
-        cookie_1.default.deleteCookie(this.accessTokenCookieName);
-        this.tokenInfoChanged(null);
+        this.storage.remove(this.accessTokenInfoKey);
+        this.storage.remove(this.accessTokenKey);
+        this.tokenInfoChanged.run(null);
     };
-    Auth.prototype.onTokenInfoChanged = function (handler) {
-        var _this = this;
-        if (!handler) {
-            return noop_1.default;
-        }
-        this.tokenInfoChangedHandlers.push(handler);
-        return function () {
-            var index = _this.tokenInfoChangedHandlers.indexOf(handler);
-            if (index > -1) {
-                _this.tokenInfoChangedHandlers.splice(index, 1);
-            }
-        };
-    };
-    Auth.prototype.tokenInfoChanged = function (newInfo) {
-        this.tokenInfoChangedHandlers.forEach(function (handler) { return handler(newInfo); });
+    Auth.prototype.setStorage = function (storage) {
+        this.storage = storage;
     };
     return Auth;
 }());
 exports.Auth = Auth;
 ;
-var auth = new Auth('accessTokenInfo', 'accessToken');
-Object.defineProperty(exports, "__esModule", { value: true });
+var auth = new Auth('accessToken', cookieStorage_1.default);
 exports.default = auth;
+//# sourceMappingURL=auth.js.map

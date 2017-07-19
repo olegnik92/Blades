@@ -16,11 +16,11 @@ export class CookieOptions {
 
 export class CookieApi {
 
-    getCookie(name: string): string {
+    getCookie(name: string): string | null {
         let matches = document.cookie.match(new RegExp(
             "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
         ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
+        return matches ? decodeURIComponent(matches[1]) : null;
     }
 
 
@@ -44,7 +44,7 @@ export class CookieApi {
 
         for (var propName in options) {
             updatedCookie += "; " + propName;
-            var propValue = options[propName];
+            var propValue = (<any>options)[propName];
             if (propValue !== true) {
                 updatedCookie += "=" + propValue;
             }

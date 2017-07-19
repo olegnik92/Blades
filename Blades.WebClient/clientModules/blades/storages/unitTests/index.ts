@@ -1,7 +1,7 @@
 ﻿import ITempStorage from '../tempStorage';
 import { localStorage, sessionStorage } from '../browserStorage';
 import cookieStorage from '../cookieStorage';
-
+import '../../jasmine';
 
 describe('Blades Temp storage tests', () => {
 
@@ -28,7 +28,7 @@ function testScript(storage: ITempStorage, longInterval: boolean): void  {
     it('Add item', () => {
         const item = { a: 5 };
         storage.set('item', item);
-        const savedItem = storage.get('item');
+        const savedItem = <any>storage.get('item');
         expect(savedItem['a']).toBe(5);
     });
 
@@ -36,7 +36,7 @@ function testScript(storage: ITempStorage, longInterval: boolean): void  {
         const item = { a: 5 };
         storage.set('item', item, expireInterval);
         setTimeout(() => {
-            const savedItem = storage.get('item');
+            const savedItem = <any>storage.get('item');
             expect(savedItem['a']).toBe(5);
         }, test1Interval);
 
@@ -69,7 +69,7 @@ function testScript(storage: ITempStorage, longInterval: boolean): void  {
     it('Remove item', () => {
         const item = { a: 6 };
         storage.set('item', item);
-        const savedItem = storage.get('item');
+        const savedItem = <any>storage.get('item');
         expect(savedItem['a']).toBe(6);
 
         storage.remove('item');

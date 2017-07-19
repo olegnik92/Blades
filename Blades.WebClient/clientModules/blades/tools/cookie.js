@@ -1,4 +1,6 @@
 "use strict";
+//code based on https://learn.javascript.ru/cookie
+Object.defineProperty(exports, "__esModule", { value: true });
 var CookieOptions = (function () {
     function CookieOptions(expires) {
         this.expires = expires;
@@ -12,14 +14,14 @@ var CookieApi = (function () {
     }
     CookieApi.prototype.getCookie = function (name) {
         var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
+        return matches ? decodeURIComponent(matches[1]) : null;
     };
     CookieApi.prototype.setCookie = function (name, value, options) {
         options = options || new CookieOptions();
         var expires = options.expires;
         if (typeof expires == "number" && expires) {
             var d = new Date();
-            d.setTime(d.getTime() + expires * 1000);
+            d.setTime(d.getTime() + expires);
             expires = options.expires = d;
         }
         if (expires && expires.toUTCString) {
@@ -43,5 +45,5 @@ var CookieApi = (function () {
 }());
 exports.CookieApi = CookieApi;
 var cookie = new CookieApi();
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = cookie;
+//# sourceMappingURL=cookie.js.map

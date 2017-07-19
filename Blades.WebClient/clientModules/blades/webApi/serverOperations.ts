@@ -1,6 +1,5 @@
 ﻿import Xhr from './xhr';
 import connection from './serverConnection';
-import { Promise } from 'es6-promise';
 import json from '../tools/json';
 
 

@@ -23,8 +23,8 @@ function getExpireDateNumber(expire: number | Date): number {
     return 0;
 };
 
-function isShouldRemove(expire: number): boolean {
-    return expire && expire < Date.now();
+function isShouldRemove(expire: number | undefined): boolean {
+    return expire !== undefined && expire !== 0 && expire < Date.now();
 };
 
 abstract class BrowserStorage implements ITempStorage {
@@ -45,7 +45,7 @@ abstract class BrowserStorage implements ITempStorage {
     }
 
 
-    public get(key: string): Object {
+    public get(key: string): Object | null {
         const itemStr = this.storage.getItem(key);
         if (!itemStr) {
             return null;
@@ -78,8 +78,8 @@ abstract class BrowserStorage implements ITempStorage {
     }
 
 
-    public getStr(key: string): string {
-        const expire = parseInt(this.storage.getItem(expireValueKey(key)));
+    public getStr(key: string): string | null{
+        const expire = parseInt(this.storage.getItem(expireValueKey(key)) || '');
         if (isShouldRemove(expire)) {
             this.storage.removeItem(expireValueKey(key));
             this.storage.removeItem(key);

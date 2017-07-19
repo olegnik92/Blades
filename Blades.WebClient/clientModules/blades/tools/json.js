@@ -1,8 +1,18 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//date parse method from https://weblog.west-wind.com/posts/2014/jan/06/javascript-json-date-parsing-and-real-dates
 var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
 var reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;
 var parseMsAjaxDate = false;
 var dateParser = function (key, value) {
+    /// <summary>
+    /// Globally enables JSON date parsing for JSON.parse().
+    /// Replaces the default JSON.parse() method and adds
+    /// the datePaser() extension to the processing chain.
+    /// </summary>    
+    /// <param name="key" type="string">property name that is parsed</param>
+    /// <param name="value" type="any">property value</param>
+    /// <returns type="date">returns date or the original value if not a date string</returns>
     if (typeof value === 'string') {
         var a = reISO.exec(value);
         if (a)
@@ -24,6 +34,7 @@ var json = {
             return res;
         }
         catch (e) {
+            // orignal error thrown has no error message so rethrow with message
             throw new Error("JSON content could not be parsed");
         }
     },
@@ -31,5 +42,5 @@ var json = {
         return JSON.stringify(data);
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = json;
+//# sourceMappingURL=json.js.map

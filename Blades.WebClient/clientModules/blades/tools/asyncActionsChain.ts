@@ -1,5 +1,4 @@
-﻿import { Promise } from 'es6-promise';
-import noop, { echoPromise } from './noop';
+﻿import noop, { echoPromise } from './noop';
 
 
 class AsyncActionsChain<T> {

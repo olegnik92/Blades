@@ -5,7 +5,7 @@ const reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;
 
 const parseMsAjaxDate = false;
 
-const dateParser = function (key, value) {
+const dateParser = function (key: string, value: any) {
     /// <summary>
     /// Globally enables JSON date parsing for JSON.parse().
     /// Replaces the default JSON.parse() method and adds

@@ -14,7 +14,7 @@ export class CookieStorage implements ITempStorage {
         cookie.setCookie(key, json.stringify(value), options); 
     }
 
-    public get(key: string): Object {
+    public get(key: string): Object | null {
         const itemStr = cookie.getCookie(key);
         if (!itemStr) {
             return null;
@@ -37,7 +37,7 @@ export class CookieStorage implements ITempStorage {
         cookie.setCookie(key, value, options);
     }
 
-    public getStr(key: string): string {
+    public getStr(key: string): string | null {
         const itemStr = cookie.getCookie(key);
         if (typeof itemStr !== 'string') {
             return null;
