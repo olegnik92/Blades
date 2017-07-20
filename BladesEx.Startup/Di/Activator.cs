@@ -49,6 +49,7 @@ namespace BladesEx.Startup.Di
                 //Data storagte (works with mongodb) 
                 new DiRule { Service = typeof(ITransactRepositoryFactory), Realization = typeof(TransactRepositoryFactory)  },
                 new DiRule { Service = typeof(IEsRepository), Realization = typeof(EsRepository)  },
+                new DiRule { Service = typeof(ICollectionsRepository), Realization = typeof(SimpleCollectionsRepository)  },
             };
 
             return rules.ToDictionary(r => r.Service.FullName, r => r);
