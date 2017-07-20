@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basis\HistoryRepository.cs" />
+    <Compile Include="Basis\SimpleCollectionsRepository.cs" />
+    <Compile Include="DataStore\StoreItem.cs" />
+    <Compile Include="Interfaces\ICollectionsRepository.cs" />
     <Compile Include="Interfaces\IEsRepository.cs" />
     <Compile Include="Interfaces\ITransactRepositoryFactory.cs" />
     <Compile Include="Basis\TransactRepositoryFactory.cs" />

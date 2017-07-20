@@ -16,20 +16,33 @@ namespace BladesStartUp
 {
     class Program
     {
-        private static void M1()
+
+
+        class Item: Blades.DataStore.StoreItem
         {
-            throw new ArgumentException("Some bad Argument");
+            public int A { get; set; }
         }
 
 
-        private static void M2()
+        static void FastTests()
         {
-            M1();
+            var dbClient = new MongoClient("mongodb://localhost:27017");
+            var db = dbClient.GetDatabase("TestDataStore");
+            var repo = new Blades.DataStore.Basis.SimpleCollectionsRepository(db);
+
+            var addedItems = repo.Query<Item>().ToList();
+            foreach(var item in addedItems)
+            {
+                item.A += 100;
+            }
+            repo.AddOrUpdate((IEnumerable<Item>)addedItems);
+            addedItems = repo.Query<Item>().ToList();
         }
 
         static void Main(string[] args)
         {
             var a = new Blades.WebClient.TestOperations.EchoOperation();
+            FastTests();
 
             Console.WriteLine("Start up project fired");
             string baseAddress = "http://localhost:9000/";
