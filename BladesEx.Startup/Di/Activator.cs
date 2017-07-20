@@ -28,13 +28,41 @@ namespace BladesEx.Startup.Di
 {
     public class Activator : IOperationsActivator, ICommandReceiverActivator, IBladesServiceLocator, IHttpControllerActivator
     {
+        public static Dictionary<string, DiRule> SingletonServicesRules { get; private set; } = CreateDefaultSingletonServicesRules();
+
+        private static Dictionary<string, DiRule> CreateDefaultSingletonServicesRules()
+        {
+            var rules = new List<DiRule>()
+            {
+                new DiRule { Service = typeof(ITypeIdMap), Realization = typeof(TypeIdMap)  },
+                new DiRule { Service = typeof(ILogger), Realization = typeof(ConsoleLogger)  },
+                new DiRule { Service = typeof(IOperationMetaInfoProvider), Realization = typeof(OperationMetaInfoProvider)  },
+                new DiRule { Service = typeof(IOperationsExecutor), Realization = typeof(OperationsExecutor)  },
+                new DiRule { Service = typeof(IUsersNotifier), Realization = typeof(UsersNotifier)  },
+                new DiRule { Service = typeof(ICommandEmitter), Realization = typeof(CommandEmiter)  },
+                new DiRule { Service = typeof(IDataConverter), Realization = typeof(DataConverter)  },
+                new DiRule { Service = typeof(IOperationsHistory), Realization = typeof(HistoryRepository)  },
+                new DiRule { Service = typeof(ICommandsHistory), Realization = typeof(HistoryRepository)  },
+                new DiRule { Service = typeof(IAuthManager), Realization = typeof(BasisForTests)  },
+                new DiRule { Service = typeof(IPermissionRequirementChecker), Realization = typeof(BasisForTests)  },
+
+                //Data storagte (works with mongodb) 
+                new DiRule { Service = typeof(ITransactRepositoryFactory), Realization = typeof(TransactRepositoryFactory)  },
+                new DiRule { Service = typeof(IEsRepository), Realization = typeof(EsRepository)  },
+            };
+
+            return rules.ToDictionary(r => r.Service.FullName, r => r);
+        }
+
+
         public IWindsorContainer Container { get; private set; }
 
         public Activator(ApplicationInfo appInfo)
         {
             Container = new WindsorContainer();
 
-            RegisterBladesServices();
+            ReristerOwnRoles();
+            RegisterSingletonServices();
             RegisterTransientTypes(typeof(Operation), typeof(ICommandReceiver), typeof(IHttpController));
 
             appInfo.DataBase = appInfo.DataBase ?? GetDataBaseConfig();
@@ -42,6 +70,11 @@ namespace BladesEx.Startup.Di
             {
                 RegisterDatabase(appInfo.DataBase);
             }
+        }
+
+        private void ReristerOwnRoles()
+        {
+            Container.Register(Component.For(new[] { typeof(IOperationsActivator), typeof(ICommandReceiverActivator), typeof(IBladesServiceLocator) }).Instance(this));
         }
 
         Operation IOperationsActivator.Create(Type operationType)
@@ -67,35 +100,25 @@ namespace BladesEx.Startup.Di
         }
 
 
-
-
-        private void RegisterBladesServices()
+        private void RegisterSingletonServices()
         {
-            Container.Register(Component.For<ITypeIdMap>().ImplementedBy<TypeIdMap>());
-            Container.Register(Component.For<ILogger>().ImplementedBy<ConsoleLogger>());
-            Container.Register(Component.For<IOperationMetaInfoProvider>().ImplementedBy<OperationMetaInfoProvider>());
-            Container.Register(Component.For<IOperationsExecutor>().ImplementedBy<OperationsExecutor>());
-            Container.Register(Component.For<IUsersNotifier>().ImplementedBy<UsersNotifier>());
-            Container.Register(Component.For<ICommandEmitter>().ImplementedBy<CommandEmiter>());
-
-            Container.Register(Component.For<IDataConverter>().ImplementedBy<DataConverter>());
-
-
-            Container.Register(Component.For(new[] { typeof(IOperationsHistory), typeof(ICommandsHistory) }).ImplementedBy<HistoryRepository>());
-            Container.Register(Component.For(new[] { typeof(IOperationsActivator), typeof(ICommandReceiverActivator), typeof(IBladesServiceLocator) }).Instance(this));
-
-            Container.Register(Component.For(new[] { typeof(IAuthManager), typeof(IPermissionRequirementChecker) }).ImplementedBy<BasisForTests>());
+            foreach(var rule in SingletonServicesRules.Values)
+            {
+                Container.Register(Component.For(rule.Service).Named(rule.Service.FullName).ImplementedBy(rule.Realization));
+            }
         }
 
 
         private void RegisterDatabase(DataBaseConfig config)
         {
+            if(config.Driver != DataBaseConfig.MongoDriver)
+            {
+                throw new NotSupportedException("По умолчанию поддерживается только MongoDB");
+            }
             var dbClient = new MongoClient(config.ConnectionString);
             var db = dbClient.GetDatabase(config.Name);
 
             Container.Register(Component.For<IMongoDatabase>().Instance(db));
-            Container.Register(Component.For<ITransactRepositoryFactory>().ImplementedBy<TransactRepositoryFactory>());
-            Container.Register(Component.For<IEsRepository>().ImplementedBy<EsRepository>());
         }
 
 
@@ -152,6 +175,14 @@ namespace BladesEx.Startup.Di
             {
                 this.release();
             }
+        }
+
+
+        public class DiRule
+        {
+            public Type Service { get; set; }
+
+            public Type Realization { get; set; }
         }
     }
 }

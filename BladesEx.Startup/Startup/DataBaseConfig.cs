@@ -9,6 +9,10 @@ namespace BladesEx.Startup
 {
     public class DataBaseConfig
     {
+        public const string MongoDriver = "MongoDB";
+
+        public string Driver { get; set; } = MongoDriver;
+
         public string ConnectionString { get; set; }
 
         public string Name { get; set; }
@@ -17,6 +21,15 @@ namespace BladesEx.Startup
 
     internal class DataBaseConfigElement : ConfigurationElement
     {
+        [ConfigurationProperty("Driver")]
+        public string Driver
+        {
+            get
+            {
+                return (string)this["Driver"];
+            }
+        }
+
         [ConfigurationProperty("ConnectionString")]
         public string ConnectionString
         {

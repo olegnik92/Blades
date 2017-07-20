@@ -13,6 +13,7 @@ namespace BladesExStartup
     {
         static void Main(string[] args)
         {
+            var rules = BladesEx.Startup.Di.Activator.SingletonServicesRules;
             using (WebApp.Start<Startup>("http://localhost:9000"))
             {
                 Console.ReadLine();
