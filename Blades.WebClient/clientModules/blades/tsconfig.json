@@ -5,7 +5,7 @@
     "module": "commonjs",                     /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     "strict": true ,                           /* Enable all strict type-checking options. */
     "lib": [ "es2015", "dom"],
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": "./clientModules",
     "types": []
   }

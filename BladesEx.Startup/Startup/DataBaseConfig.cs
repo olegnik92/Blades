@@ -31,7 +31,7 @@ namespace BladesEx.Startup
         {
             get
             {
-                return (string)this["AllowPostFromShare"];
+                return (string)this["Name"];
             }
         }
     }

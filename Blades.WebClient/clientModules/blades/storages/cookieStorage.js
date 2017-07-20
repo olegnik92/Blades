@@ -46,4 +46,3 @@ exports.CookieStorage = CookieStorage;
 ;
 var cookieStorage = new CookieStorage();
 exports.default = cookieStorage;
-//# sourceMappingURL=cookieStorage.js.map

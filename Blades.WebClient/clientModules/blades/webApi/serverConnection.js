@@ -125,4 +125,3 @@ var ServerConnection = (function () {
 exports.ServerConnection = ServerConnection;
 var connection = new ServerConnection();
 exports.default = connection;
-//# sourceMappingURL=serverConnection.js.map

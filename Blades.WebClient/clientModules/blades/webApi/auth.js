@@ -70,4 +70,3 @@ exports.Auth = Auth;
 ;
 var auth = new Auth('accessToken', cookieStorage_1.default);
 exports.default = auth;
-//# sourceMappingURL=auth.js.map

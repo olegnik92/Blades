@@ -63,4 +63,3 @@ var StorageTabsCommunicator = (function () {
 exports.StorageTabsCommunicator = StorageTabsCommunicator;
 var storageTabsCommunicator = StorageTabsCommunicator.instance;
 exports.default = storageTabsCommunicator;
-//# sourceMappingURL=storageTabsCommunicator.js.map

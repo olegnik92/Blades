@@ -63,4 +63,3 @@ function testScript(storage, longInterval) {
     });
 }
 ;
-//# sourceMappingURL=index.js.map

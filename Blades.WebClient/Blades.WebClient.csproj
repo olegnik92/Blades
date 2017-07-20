@@ -56,13 +56,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="clientModules\blades\package.json" />
-    <Content Include="clientModules\blades\jasmine\boot.js" />
-    <Content Include="clientModules\blades\jasmine\index.html" />
-    <Content Include="clientModules\blades\jasmine\jasmine-html.js" />
-    <Content Include="clientModules\blades\jasmine\jasmine.css" />
-    <Content Include="clientModules\blades\jasmine\jasmine.js" />
-    <Content Include="clientModules\blades\jasmine\jasmine_favicon.png" />
-    <Content Include="clientModules\blades\jasmine\json2.js" />
+    <Content Include="public\unitTests\boot.js" />
+    <Content Include="public\unitTests\index.html" />
+    <Content Include="public\unitTests\jasmine-html.js" />
+    <Content Include="public\unitTests\jasmine.css" />
+    <Content Include="public\unitTests\jasmine.js" />
+    <Content Include="public\unitTests\jasmine_favicon.png" />
+    <Content Include="public\unitTests\json2.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="clientModules\blades\storages\browserStorage.ts" />
@@ -86,7 +86,6 @@
     <TypeScriptCompile Include="clientModules\blades\webApi\tokenInfo.ts" />
     <TypeScriptCompile Include="clientModules\blades\webApi\unitTests\index.ts" />
     <TypeScriptCompile Include="clientModules\blades\webApi\xhr.ts" />
-    <TypeScriptCompile Include="clientModules\blades\jasmine\index.d.ts" />
     <TypeScriptCompile Include="clientModules\blades\jasmine\ownTest.ts" />
   </ItemGroup>
   <ItemGroup>

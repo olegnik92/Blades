@@ -69,4 +69,3 @@ var Barrier = (function () {
 }());
 ;
 exports.default = Barrier;
-//# sourceMappingURL=barrier.js.map

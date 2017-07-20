@@ -13,7 +13,7 @@
   </metadata>
 
   <files>
-    <file src="clientModules\blades\**.ts" target="content\clientModules\blades" exclude="**\node_modules\**" />
-    <file src="clientModules\blades\jasmine\" target="content\clientModules\blades\jasmine" />
+    <file src="clientModules\blades\" target="content\clientModules\blades" exclude="**\node_modules\**" />
+    <file src="public\" target="content\public" />
   </files>
 </package>

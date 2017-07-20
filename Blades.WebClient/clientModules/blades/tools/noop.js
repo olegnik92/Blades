@@ -14,4 +14,3 @@ function echoPromise(data) {
 }
 exports.echoPromise = echoPromise;
 ;
-//# sourceMappingURL=noop.js.map

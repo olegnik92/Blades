@@ -19,11 +19,13 @@ namespace Blades.DataStore.Basis.Es
 
         private IMongoDatabase db;
         private Guid transactionId;
-        private Action<EsRepository> onCommit;
+        private Action<EsRepository> onDispose;
+
+        private bool disposed = false;
 
         //Create for write
         //should create only with Transact Repo factory
-        internal EsRepository(IMongoDatabase db, Guid transactionId, Action<EsRepository> onCommit)
+        internal EsRepository(IMongoDatabase db, Guid transactionId, Action<EsRepository> onDispose)
         {
             if (Guid.Empty.Equals(transactionId))
             {
@@ -32,7 +34,7 @@ namespace Blades.DataStore.Basis.Es
 
             this.db = db;
             this.transactionId = transactionId;
-            this.onCommit = onCommit;
+            this.onDispose = onDispose;
             this.unsavedEvents = new ConcurrentBag<MutationEventStoreItem>();
         }
 
@@ -145,6 +147,11 @@ namespace Blades.DataStore.Basis.Es
         private static object locker = new object();
         public void Commit()
         {
+            if (disposed)
+            {
+                return;
+            }
+
             if (Guid.Empty.Equals(transactionId))
             {
                 return;
@@ -163,9 +170,39 @@ namespace Blades.DataStore.Basis.Es
                 }
             }
 
-            onCommit(this);
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        //Вызов метода Despose без предварительного комита - некий эквивалент transaction rollback
+        //так как все хранится в памяти, то и откатывать особо нечего.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            // release unmanaged resources
+            // nothing to release
+            if (disposing)
+            { // release other disposable objects
+                unsavedEvents = null;
+            }
+
+            onDispose(this);
+            disposed = true;
         }
 
 
+        ~EsRepository()
+        {
+            Dispose(false);
+        }
     }
 }

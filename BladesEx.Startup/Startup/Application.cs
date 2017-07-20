@@ -5,7 +5,9 @@ using Microsoft.Owin.StaticFiles;
 using Owin;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http.Dispatcher;
@@ -14,6 +16,35 @@ namespace BladesEx.Startup
 {
     public static class Application
     {
+
+        public static List<Assembly> AssembliesForceLoad(Func<List<string>, List<string>> filesFilter = null)
+        {
+            //from https://stackoverflow.com/questions/2384592/is-there-a-way-to-force-all-referenced-assemblies-to-be-loaded-into-the-app-doma
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
+
+            var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
+            var toLoad = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase)).ToList();
+            if (filesFilter != null)
+            {
+                toLoad = filesFilter(toLoad);
+            }
+            toLoad.ForEach(path => TryLoadAssembly(path, ref loadedAssemblies));
+            return loadedAssemblies;
+        }
+
+        private static void TryLoadAssembly(string path, ref List<Assembly> loadedAssemblies)
+        {
+            try
+            {
+                loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path)));
+            }
+            catch(Exception err)
+            {
+                Console.WriteLine(err);
+            }
+        }
+
 
         public static ApplicationInfo AppInfo { get; private set; }
 

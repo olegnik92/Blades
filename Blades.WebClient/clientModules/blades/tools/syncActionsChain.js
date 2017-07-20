@@ -39,4 +39,3 @@ var SyncActionsChain = (function () {
 }());
 ;
 exports.default = SyncActionsChain;
-//# sourceMappingURL=syncActionsChain.js.map

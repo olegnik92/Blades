@@ -110,4 +110,3 @@ var LocalStorage = (function (_super) {
 }(BrowserStorage));
 exports.LocalStorage = LocalStorage;
 exports.localStorage = new LocalStorage();
-//# sourceMappingURL=browserStorage.js.map

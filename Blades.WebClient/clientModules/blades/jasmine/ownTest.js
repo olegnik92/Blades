@@ -9,4 +9,3 @@ describe('Jasmine own tests', function () {
         expect(2).toBe(2);
     });
 });
-//# sourceMappingURL=ownTest.js.map

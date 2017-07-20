@@ -115,4 +115,3 @@ var Xhr = (function () {
     return Xhr;
 }());
 exports.default = Xhr;
-//# sourceMappingURL=xhr.js.map

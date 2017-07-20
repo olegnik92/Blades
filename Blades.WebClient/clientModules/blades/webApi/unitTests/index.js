@@ -212,4 +212,3 @@ describe('Web socket connection Tests', function () {
         });
     });
 });
-//# sourceMappingURL=index.js.map

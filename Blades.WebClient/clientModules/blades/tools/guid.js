@@ -19,4 +19,3 @@ var Guid = (function () {
     return Guid;
 }());
 exports.default = Guid;
-//# sourceMappingURL=guid.js.map

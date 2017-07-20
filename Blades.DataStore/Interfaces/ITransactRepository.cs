@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Blades.DataStore.Interfaces
 {
-    public interface ITransactRepository
+    public interface ITransactRepository : IDisposable
     {
         Guid TransactionId { get; }
         void Commit();
