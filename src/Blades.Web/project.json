@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Blades.Core": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.3",
+    "NETStandard.Library": "1.6.0",
+    "Newtonsoft.Json": "10.0.3"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
