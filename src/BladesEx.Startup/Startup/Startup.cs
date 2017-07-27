@@ -44,7 +44,21 @@ namespace BladesEx.Startup
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            UseCookieAuth(app);
+
             app.UseMvc();
+        }
+
+
+        public void UseCookieAuth(IApplicationBuilder app)
+        {
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationScheme = Blades.Auth.Controllers.CookieAuthController.AuthScheme,
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true
+            });
         }
     }
 }
