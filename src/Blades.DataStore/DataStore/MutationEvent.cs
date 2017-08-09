@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Blades.Es
+namespace Blades.DataStore
 {
     public class MutationEvent
     {
         public Guid Id { get; set; }
 
-        public ulong BaseVersion { get; set; }
+        /// <summary>
+        /// Mutation reason command
+        /// </summary>
+        public Guid CommandId { get; set; }
 
-        public byte DetalizationLevel { get; set; }
+        public ulong BaseVersion { get; set; }
 
         public override string ToString()
         {

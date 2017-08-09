@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Blades.Es.Interfaces
+namespace Blades.DataStore.Interfaces
 {
     public interface IMutationHandler<TState, TEvent> where TEvent: MutationEvent
     {

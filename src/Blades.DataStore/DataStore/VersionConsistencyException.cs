@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Blades.Es
+namespace Blades.DataStore
 {
     public class VersionConsistencyException : Exception
     {

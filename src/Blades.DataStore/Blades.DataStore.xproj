@@ -7,8 +7,8 @@
 
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>733f8716-ca20-4bdb-8907-91cebf524fc0</ProjectGuid>
-    <RootNamespace>Blades.Es</RootNamespace>
+    <ProjectGuid>adc64aa8-7a1f-4e02-b060-ba2779452367</ProjectGuid>
+    <RootNamespace>Blades.DataStore</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
