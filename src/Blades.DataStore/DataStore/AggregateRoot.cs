@@ -21,7 +21,10 @@ namespace Blades.DataStore
 
         public ulong Version { get; private set; }
 
-        public AggregateRoot(IEsRepository repo, Guid instanceId)
+        public event Action<MutationEvent> OnMutationEventPushed;
+        public event Action<TState> OnSnapshotPushed;
+
+        public AggregateRoot(Guid instanceId, IEsRepository repo)
         {
             AggregateInfo = this.GetType().GetTypeInfo().GetCustomAttribute<AggregateRootAttribute>();
             if (AggregateInfo == null)
@@ -34,7 +37,8 @@ namespace Blades.DataStore
             {
                 TypeId = AggregateInfo.ResourceTypeId,
                 TypeDescription = AggregateInfo.ResourceTypeDescription,
-                InstanceId = instanceId
+                InstanceId = instanceId,
+                InstanceDescription = $"ID:{instanceId}"
             };
 
             int mutationsCount;
@@ -56,6 +60,7 @@ namespace Blades.DataStore
             if (Guid.Empty.Equals(mutation.Id))
             {
                 repo.PushEvent(Resource, mutation);
+                OnMutationEventPushed?.Invoke(mutation);
             }
         }
 
@@ -86,6 +91,7 @@ namespace Blades.DataStore
         private void MakeSnapshot()
         {
             repo.PushSnapshot(Resource, State, Version);
+            OnSnapshotPushed?.Invoke(State);
         }
 
         private TState CreateState(out ulong version, out int mutationCount)

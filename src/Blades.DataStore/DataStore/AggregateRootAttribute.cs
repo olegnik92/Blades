@@ -12,7 +12,7 @@ namespace Blades.DataStore
         public string ResourceTypeDescription { get; private set; }
         public int SnapshotInterval { get; private set; }
 
-        public AggregateRootAttribute(string resourceTypeId, string resourceTypeDescription, int snapshotInterval = 100)
+        public AggregateRootAttribute(string resourceTypeId, string resourceTypeDescription, int snapshotInterval = 25)
         {
             ResourceTypeId = Guid.Parse(resourceTypeId);
             ResourceTypeDescription = resourceTypeDescription;
