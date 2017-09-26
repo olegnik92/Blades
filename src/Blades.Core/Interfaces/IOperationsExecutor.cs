@@ -9,14 +9,8 @@ namespace Blades.Interfaces
 {
     public interface IOperationsExecutor: IBladesService
     {
-        TResult Execute<TData, TResult>(string operationName, TData data, UserInfo user);
+        TResult Execute<TData, TResult>(Operation<TData, TResult> operation, Operation parentOperation = null, OperationExecutionReport parentOperationReport = null);
 
-        TResult Execute<TData, TResult>(Operation<TData, TResult> operation);
-
-        TResult Execute<TData, TResult>(Operation<TData, TResult> operation, Operation parentOperation, OperationExecutionReport parentOperationReport);
-
-        object Execute(string operationName, object data, UserInfo user);
-
-        object Execute(Operation operation);
+        object Execute(Operation operation, Operation parentOperation = null, OperationExecutionReport parentOperationReport = null);
     }
 }

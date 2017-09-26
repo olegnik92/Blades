@@ -9,6 +9,6 @@ namespace Blades.Interfaces
 {
     public interface IOperationsActivator: IBladesService
     {
-        Operation Create(Type operationType);
+        Operation Create(string operationName, object data, UserInfo user);
     }
 }

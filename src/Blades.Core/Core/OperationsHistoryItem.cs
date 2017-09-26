@@ -20,7 +20,13 @@ namespace Blades.Core
 
         public UserInfo User { get; set; }
 
-        public DateTime Time { get; set; }
+        public DateTime InvokedTime { get; set; }
+
+        public DateTime PermissionsValidationVinishedTime { get; set; }
+
+        public DateTime DataValidationVinishedTime { get; set; }
+
+        public DateTime ExecutionVinishedTime { get; set; }
 
         public OperationExecutionStatus ExecutionStatus { get; set; }
 
@@ -35,8 +41,7 @@ namespace Blades.Core
             ParentOperationId = operation.ParentOpearionId;
             Name = operation.Name;
             User = operation.User;
-            Title = operation.Title;
-            Time = DateTime.Now;         
+            Title = operation.Title;  
         }
     }
 }

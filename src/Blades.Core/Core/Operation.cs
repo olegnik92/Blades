@@ -41,6 +41,11 @@ namespace Blades.Core
         {
             return null;
         }
+
+        public virtual bool SaveInHistory
+        {
+            get { return false; }
+        }
     }
 
     public abstract class Operation<TData, TResult> : Operation
