@@ -18,8 +18,6 @@ namespace Blades.Core
 
         public string Title { get; protected set; }
 
-        public OperationType Type { get; private set; }
-
         public Operation()
         {        
             var opAttr = GetType().GetTypeInfo().GetCustomAttribute<OperationAttribute>();
@@ -29,7 +27,6 @@ namespace Blades.Core
             }
 
             Name = opAttr.Name;
-            Type = opAttr.Type;
             Title = opAttr.Title;
         }
 

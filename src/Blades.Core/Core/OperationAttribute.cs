@@ -13,12 +13,9 @@ namespace Blades.Core
 
         public string Title { get; set; }
 
-        public OperationType Type { get; private set; }
-
-        public OperationAttribute(string name, OperationType type, string title)
+        public OperationAttribute(string name, string title)
         {
             Name = name;
-            Type = type;
             Title = title;
         }
     }
