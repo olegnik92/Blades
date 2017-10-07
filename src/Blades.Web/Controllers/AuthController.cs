@@ -16,14 +16,11 @@ namespace Blades.Auth.Controllers
     {
         public const string AuthScheme = "CookieAuth";
 
-        private ILogger log;
         private IAuthManager authManager;
-        public CookieAuthController(ILogger log, IAuthManager authManager)
+        public CookieAuthController(IAuthManager authManager)
         {
-            this.log = log;
             this.authManager = authManager;
         }
-
 
 
         [HttpPost]

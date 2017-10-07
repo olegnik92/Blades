@@ -12,7 +12,7 @@ namespace Blades.Auth.Interfaces
     {
         bool HasRequirement(UserInfo user, PermissionRequirement requirement);
 
-        bool HasRequirement(UserInfo user, PermissionType permission, Resource resource);
+        bool HasRequirement(UserInfo user, PermissionType permission, ResourceInfo resource);
 
         bool HasRequirement(UserInfo user, PermissionType permission, Guid resourceTypeId, Guid resourceInstanceId);
 

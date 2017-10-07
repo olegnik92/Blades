@@ -3,8 +3,8 @@
 
   "dependencies": {
     "Blades.Core": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.3",
-    "NETStandard.Library": "1.6.1"
+    "NETStandard.Library": "1.6.1",
+    "System.ComponentModel.Primitives": "4.3.0"
   },
 
   "frameworks": {

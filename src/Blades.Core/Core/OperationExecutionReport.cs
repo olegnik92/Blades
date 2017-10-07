@@ -12,7 +12,7 @@ namespace Blades.Core
 
         public List<Error> Errors { get; set; } = new List<Error>();
 
-        public List<Resource> AssociatedResources { get; set; } = new List<Resource>();
+        public List<ResourceInfo> AssociatedResources { get; set; } = new List<ResourceInfo>();
 
         public List<OperationExecutionReport> SubReports { get; private set; } = new List<OperationExecutionReport>();
 

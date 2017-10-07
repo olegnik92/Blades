@@ -9,7 +9,7 @@ namespace Blades.Auth
 {
     public class PermissionRequirement
     {
-        public Resource Recource { get; set; }
+        public ResourceInfo Recource { get; set; }
 
         public PermissionType Requirement { get; set; }
     }

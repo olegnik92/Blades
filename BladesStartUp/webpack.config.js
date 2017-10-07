@@ -1,6 +1,4 @@
-﻿/// <binding ProjectOpened='Watch - Development' />
-
-"use strict";
+﻿"use strict";
 
 var WebpackNotifierPlugin = require('webpack-notifier');
 var webpack = require('webpack');

@@ -14,7 +14,7 @@ namespace Blades.DataStore
     {
 
         private IEsRepository repo;
-        public Resource Resource { get; private set; }
+        public ResourceInfo Resource { get; private set; }
         public TState State { get; private set; }
 
         public AggregateRootAttribute AggregateInfo { get; private set; }
@@ -33,12 +33,12 @@ namespace Blades.DataStore
             }
 
             this.repo = repo;
-            this.Resource = new Resource
+            this.Resource = new ResourceInfo
             {
                 TypeId = AggregateInfo.ResourceTypeId,
-                TypeDescription = AggregateInfo.ResourceTypeDescription,
+                TypeName = AggregateInfo.ResourceTypeDescription,
                 InstanceId = instanceId,
-                InstanceDescription = $"ID:{instanceId}"
+                InstanceName = $"ID:{instanceId}"
             };
 
             int mutationsCount;

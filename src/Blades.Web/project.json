@@ -2,6 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
+    "Blades.Auth": "1.0.0-*",
     "Blades.Core": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.3",
     "NETStandard.Library": "1.6.1",

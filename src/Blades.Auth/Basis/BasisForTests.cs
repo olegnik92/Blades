@@ -23,7 +23,7 @@ namespace Blades.Auth.Basis
             return user.Login.ToLower() == "admin";
         }
 
-        public bool HasRequirement(UserInfo user, PermissionType permission, Resource resource)
+        public bool HasRequirement(UserInfo user, PermissionType permission, ResourceInfo resource)
         {
             return user.Login.ToLower() == "admin";
         }

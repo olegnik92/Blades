@@ -8,12 +8,12 @@ namespace Blades.DataStore.Interfaces
 {
     public interface IEsRepository
     {
-        TState GetLastSnapshot<TState>(Resource resource, out ulong version);
+        TState GetLastSnapshot<TState>(ResourceInfo resource, out ulong version);
 
-        List<MutationEvent> GetEvents(Resource resource, ulong startVersion);
+        List<MutationEvent> GetEvents(ResourceInfo resource, ulong startVersion);
 
-        void PushSnapshot<TState>(Resource resource, TState state, ulong version);
+        void PushSnapshot<TState>(ResourceInfo resource, TState state, ulong version);
 
-        void PushEvent(Resource resource, MutationEvent mutation);
+        void PushEvent(ResourceInfo resource, MutationEvent mutation);
     }
 }

@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Blades.Core
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public class TypeIdAttribute : Attribute
+    public class ResourceTypeAttribute : TypeIdAttribute
     {
-        public Guid TypeId { get; private set; }
-        public TypeIdAttribute(string typeId)
+        public ResourceTypeAttribute(string typeId, string typeName) : base(typeId)
         {
-            TypeId = Guid.Parse(typeId);
+            TypeName = typeName;
         }
+
+
+        public string TypeName { get; private set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Blades.Basis
                 return Guid.Empty;
             }
 
-            return typeIdAttr.ClassTypeId;
+            return typeIdAttr.TypeId;
         }
 
         public Type Get(Guid id)
