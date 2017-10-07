@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Blades.Commands.Interfaces;
 using Blades.Core;
 using System.Collections.Concurrent;
-using Blades.Core.System;
+using Blades.System;
 using System.Reflection;
 
 namespace Blades.Commands.Basis

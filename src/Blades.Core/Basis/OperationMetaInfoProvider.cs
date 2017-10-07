@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Blades.Core;
 using Blades.Interfaces;
-using Blades.Core.System;
+using Blades.System;
 using System.Reflection;
 
 namespace Blades.Basis

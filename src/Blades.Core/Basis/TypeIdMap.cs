@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Threading.Tasks;
-using Blades.Core.System;
+using Blades.System;
 
 namespace Blades.Basis
 {

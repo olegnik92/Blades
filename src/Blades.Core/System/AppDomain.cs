@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyModel;
 
-namespace Blades.Core.System
+namespace Blades.System
 {
     public class AppDomain
     {
