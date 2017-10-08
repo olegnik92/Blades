@@ -1,20 +1,20 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
 
   "dependencies": {
+    "Blades.Core": "1.0.0-*"
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": "dnxcore50",
       "dependencies": {
-        "Microsoft.NETCore.App": "1.1.2"
+        "Microsoft.NETCore.App": "1.1.4"
       }
-    },
-    "Net461": {}
+    }
   },
 
   "runtimes": {

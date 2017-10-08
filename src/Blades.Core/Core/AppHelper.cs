@@ -16,18 +16,37 @@ namespace Blades.Core
 
         public static List<Assembly> GetAssemblies()
         {
+            return loadedAssemblies.Value;
+        }
+
+        private static Lazy<List<Assembly>> loadedAssemblies = new Lazy<List<Assembly>>(() =>
+        {
+#if NET461
+            return AppDomain.CurrentDomain.GetAssemblies().ToList();
+#endif
+
+            return GetAssembliesFromDependencyContext();
+        });
+
+        private static List<Assembly> GetAssembliesFromDependencyContext()
+        {
             var assemblies = new List<Assembly>();
             var dependencies = DependencyContext.Default.RuntimeLibraries;
             foreach (var library in dependencies)
             {
-                if (IsCandidateCompilationLibrary(library))
+                try
                 {
                     var assembly = Assembly.Load(new AssemblyName(library.Name));
                     assemblies.Add(assembly);
                 }
+                catch
+                {
+                    //Есди не смогли загрузить сборку, то просто пропускаеэто ушибку
+                }
             }
             return assemblies;
         }
+
 
         private static bool IsCandidateCompilationLibrary(RuntimeLibrary compilationLibrary)
         {
