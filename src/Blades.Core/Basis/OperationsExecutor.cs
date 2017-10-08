@@ -121,7 +121,7 @@ namespace Blades.Basis
             object result = null;
             try
             {
-                var executeMethod = operation.GetType().GetMethod("Execute");
+                var executeMethod = operation.GetType().GetTypeInfo().GetMethod("Execute");
                 var parameters = new object[] { null };
                 result = executeMethod.Invoke(operation, parameters);
                 report = (OperationExecutionReport)parameters[0];

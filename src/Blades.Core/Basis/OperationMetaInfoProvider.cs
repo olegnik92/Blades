@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Blades.Core;
 using Blades.Interfaces;
-using Blades.System;
 using System.Reflection;
 
 namespace Blades.Basis
@@ -16,8 +15,7 @@ namespace Blades.Basis
         public OperationMetaInfoProvider()
         {
             operationsInfo = new Dictionary<string, OperationMetaInfo>();
-            var operationTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
+            var operationTypes = AppHelper.GetAllTypes()
                 .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(Operation)) && !t.GetTypeInfo().IsGenericType && !t.GetTypeInfo().IsAbstract);
 
             foreach(var t in operationTypes)
@@ -51,6 +49,7 @@ namespace Blades.Basis
 
             return info;
         }
+
 
         public OperationMetaInfo Get(string operationName)
         {

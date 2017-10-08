@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "Microsoft.Extensions.DependencyModel": "1.1.2",
+    "Microsoft.Extensions.DependencyModel": "2.0.0",
     "NETStandard.Library": "1.6.1",
     "System.Diagnostics.StackTrace": "4.3.0",
     "System.Linq.Queryable": "4.3.0",
@@ -10,8 +10,9 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.6.1": {
       "imports": "dnxcore50"
-    }
+    },
+    "NET461": {}
   }
 }

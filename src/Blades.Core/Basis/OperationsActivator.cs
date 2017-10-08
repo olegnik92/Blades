@@ -22,7 +22,7 @@ namespace Blades.Basis
             var metaInfo = metaInfoProvider.Get(operationName);
             var operationInstance = CreateInstance(metaInfo.ClassType);
             operationInstance.User = user;
-            var dataProperty = metaInfo.ClassType.GetProperty("Data");
+            var dataProperty = metaInfo.ClassType.GetTypeInfo().GetProperty("Data");
             dataProperty.SetValue(operationInstance, data);
 
             return operationInstance;

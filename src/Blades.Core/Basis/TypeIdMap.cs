@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Threading.Tasks;
-using Blades.System;
+
 
 namespace Blades.Basis
 {
@@ -16,8 +16,7 @@ namespace Blades.Basis
 
         public TypeIdMap()
         {
-            typesMap = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
+            typesMap = AppHelper.GetAllTypes()
                 .Where(t => t.GetTypeInfo().GetCustomAttributes<TypeIdAttribute>(false).Count() > 0)
                 .ToDictionary(t => Get(t), t => t);
         }

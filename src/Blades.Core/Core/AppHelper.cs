@@ -5,18 +5,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyModel;
 
-namespace Blades.System
+namespace Blades.Core
 {
-    public class AppDomain
+    public static class AppHelper
     {
-        public static AppDomain CurrentDomain { get; private set; }
-
-        static AppDomain()
+        public static IEnumerable<Type> GetAllTypes()
         {
-            CurrentDomain = new AppDomain();
+            return GetAssemblies().SelectMany(a => a.GetTypes());
         }
 
-        public Assembly[] GetAssemblies()
+        public static List<Assembly> GetAssemblies()
         {
             var assemblies = new List<Assembly>();
             var dependencies = DependencyContext.Default.RuntimeLibraries;
@@ -28,7 +26,7 @@ namespace Blades.System
                     assemblies.Add(assembly);
                 }
             }
-            return assemblies.ToArray();
+            return assemblies;
         }
 
         private static bool IsCandidateCompilationLibrary(RuntimeLibrary compilationLibrary)
