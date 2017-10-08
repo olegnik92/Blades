@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace Blades.Core
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public class ResourceTypeAttribute : TypeIdAttribute
+    public class DomainObjectAttribute : TypeIdAttribute
     {
-        public ResourceTypeAttribute(string typeId, string typeName) : base(typeId)
+        public DomainObjectAttribute(string typeId, string typeName) : base(typeId)
         {
             TypeName = typeName;
         }

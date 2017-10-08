@@ -21,6 +21,7 @@ namespace Blades.Core
 
         private static Lazy<List<Assembly>> loadedAssemblies = new Lazy<List<Assembly>>(() =>
         {
+            //В .net framework DependencyContext.Default возвращает null
 #if NET461
             return AppDomain.CurrentDomain.GetAssemblies().ToList();
 #endif
@@ -41,7 +42,7 @@ namespace Blades.Core
                 }
                 catch
                 {
-                    //Есди не смогли загрузить сборку, то просто пропускаеэто ушибку
+                    //Есди не смогли загрузить сборку, то просто пропускаем эту ошибку
                 }
             }
             return assemblies;

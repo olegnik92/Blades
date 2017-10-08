@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blades.Core
 {
-    public class ResourceInfo
+    public class DomainObjectInfo
     {
         public Guid TypeId { get; set; }
 

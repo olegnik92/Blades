@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace Blades.Extensions
 {
-    public static class ResourceExtensions
+    public static class DomainObjectExtensions
     {
-        public static ResourceInfo GetResourceInfo(this IResource resource)
+        public static DomainObjectInfo GetResourceInfo(this IDomainObject resource)
         {
-            var resourceAttr = resource.GetType().GetTypeInfo().GetCustomAttribute<ResourceTypeAttribute>();
+            var resourceAttr = resource.GetType().GetTypeInfo().GetCustomAttribute<DomainObjectAttribute>();
             if(resourceAttr == null)
             {
-                throw new ArgumentException($"Тип аргумента не помечен атрибутом {nameof(ResourceTypeAttribute)}", "resource");
+                throw new ArgumentException($"Тип аргумента не помечен атрибутом {nameof(DomainObjectAttribute)}", "resource");
             }
 
-            var info = new ResourceInfo
+            var info = new DomainObjectInfo
             {
                 InstanceId = resource.Id,
                 InstanceName = resource.Name,

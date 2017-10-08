@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Blades.Interfaces
 {
-    public interface IResource
+    public interface IDomainObject
     {
         Guid Id { get; set; }
 
