@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.0.0
+MinimumVisualStudioVersion = 10.0.0.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{21F911E3-AC31-441B-B9A1-9FA6209BDCF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blades", "Source\Blades\Blades.csproj", "{9A281C22-5761-46CE-A0A4-950C0A44DF38}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B63FC6C8-71BC-4725-B941-16B820502DBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BladesTests", "Tests\BladesTests\BladesTests.csproj", "{030C95F4-B933-4463-AE05-07D4F68567AB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A281C22-5761-46CE-A0A4-950C0A44DF38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A281C22-5761-46CE-A0A4-950C0A44DF38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A281C22-5761-46CE-A0A4-950C0A44DF38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A281C22-5761-46CE-A0A4-950C0A44DF38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{030C95F4-B933-4463-AE05-07D4F68567AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{030C95F4-B933-4463-AE05-07D4F68567AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{030C95F4-B933-4463-AE05-07D4F68567AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{030C95F4-B933-4463-AE05-07D4F68567AB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9A281C22-5761-46CE-A0A4-950C0A44DF38} = {21F911E3-AC31-441B-B9A1-9FA6209BDCF4}
+		{030C95F4-B933-4463-AE05-07D4F68567AB} = {B63FC6C8-71BC-4725-B941-16B820502DBE}
+	EndGlobalSection
+EndGlobal
