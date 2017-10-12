@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Blades.Core.Errors;
+using Blades.Core.Services;
 
-namespace Blades.Core.Services.Basis
+namespace Blades.Core.ServicesBase
 {
     public class TypeMap : ITypeMap
     {
