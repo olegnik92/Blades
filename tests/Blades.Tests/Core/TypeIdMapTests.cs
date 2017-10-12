@@ -12,26 +12,35 @@ namespace Blades.Tests.Core
     public class TypeIdMapTests
     {
 
-        [Test]
-        public void BasicGetTest()
+        private void SearchTest(Type type, string guid)
         {
+            var id = Guid.Parse(guid);
             var typesMap = new Blades.Basis.TypeIdMap();
-            var someClassId = Guid.Parse(SomeClass.Guid);
-            var someClassType = typesMap.Get(someClassId);
-            Assert.AreEqual(someClassType.FullName, typeof(SomeClass).FullName);
+            var actualType = typesMap.Get(id);
+            Assert.AreEqual(type.FullName, actualType.FullName);
 
-            var id = typesMap.Get(typeof(SomeClass));
-            Assert.AreEqual(id, someClassId);
+            var actualId = typesMap.Get(type);
+            Assert.AreEqual(id, actualId);
+        }
+
+
+        [Test]
+        public void BasicSearchTest()
+        {
+            SearchTest(typeof(SomeClass), SomeClass.Guid);
         }
 
 
         [Test]
         public void DomainObjectSearchTest()
         {
-            var typesMap = new Blades.Basis.TypeIdMap();
-            var someDomainObjectId = Guid.Parse(SomeDomainObject.Guid);
-            var someDomainObjectType = typesMap.Get(someDomainObjectId);
-            Assert.AreEqual(someDomainObjectType.FullName, typeof(SomeDomainObject).FullName);
+            SearchTest(typeof(SomeDomainObject), SomeDomainObject.Guid);
+        }
+
+        [Test]
+        public void OperationSearchTest()
+        {
+            SearchTest(typeof(SomeOperation), SomeOperation.Guid);
         }
 
 
@@ -46,6 +55,18 @@ namespace Blades.Tests.Core
         public class SomeDomainObject
         {
             public const string Guid = "{CA710F10-683E-4466-86F3-C2A321AEB18A}";
+        }
+
+        [Operation(Guid, "Операция")]
+        public class SomeOperation : Operation<int, int>
+        {
+            public const string Guid = "{F0FCB5C2-3144-4140-8491-5570ADA2D3F3}";
+
+            public override int Execute(out OperationExecutionReport executionReport)
+            {
+                executionReport = new OperationExecutionReport();
+                return Data;
+            }
         }
     }
 
