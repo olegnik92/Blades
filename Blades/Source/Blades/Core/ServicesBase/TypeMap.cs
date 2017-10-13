@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Blades.Core.Errors;
+using Blades.Core.Extensions;
 using Blades.Core.Services;
 
 namespace Blades.Core.ServicesBase
@@ -13,15 +14,15 @@ namespace Blades.Core.ServicesBase
         
         public TypeMap()
         {
-            var types = GetAllLoadedTypes();
+            var types = LoadAllAvailableTypes(null ,null);
             foreach (var type in types)
             {
-                var id = Get(type);
+                var id = type.GetTypeLabelId();
                 if (id.Equals(Guid.Empty))
                 {
                     continue;
                 }
-                
+
                 if (_typesMap.ContainsKey(id))
                 {
                     throw new TypeIdDuplicatedException(id);
@@ -32,10 +33,27 @@ namespace Blades.Core.ServicesBase
         }
 
 
-        public static IEnumerable<Type> GetAllLoadedTypes()
+        public static List<Type> LoadAllAvailableTypes(Action<Assembly> successLog, Action<Assembly, Exception> logError)
         {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes());
+            //Могут возникнуть ошибки загрузки сборки.
+            //Все типы из корректно загруженных сборок должны попасть в результат функции.
+            var loadedTypes = new List<Type>();
+
+            var asmbls = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var asmbl in asmbls)
+            {
+                try
+                {
+                    loadedTypes.AddRange(asmbl.GetTypes());
+                    successLog?.Invoke(asmbl);
+                }
+                catch (Exception e)
+                {
+                    logError?.Invoke(asmbl, e);
+                }
+            }
+
+            return loadedTypes;
         }
         
         public Type Get(Guid typeId)
@@ -43,12 +61,8 @@ namespace Blades.Core.ServicesBase
             return _typesMap[typeId];
         }
 
-        public Guid Get(Type type)
-        {
-            return type?.GetTypeInfo().GetCustomAttribute<TypeIdAttribute>()?.Id ?? Guid.Empty;
-        }
 
-        public IEnumerable<Type> GetAllTypes()
+        public IEnumerable<Type> GetAll()
         {
             return _typesMap.Values;
         }

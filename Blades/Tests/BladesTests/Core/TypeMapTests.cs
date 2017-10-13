@@ -5,8 +5,7 @@ using Xunit;
 
 namespace BladesTests.Core
 {
-
-    public class TypeIdMapTests
+    public class TypeMapTests
     {        
         [Fact]
         public void TypeSearchTest()
@@ -28,15 +27,12 @@ namespace BladesTests.Core
 
             var actualType = typeMap.Get(id);
             Assert.Equal(type.FullName, actualType.FullName);
-
-            var actualId = typeMap.Get(type);
-            Assert.Equal(id, actualId);
         }
 
         
         
         
-        [TypeId(TypeId)]
+        [TypeLabel(TypeId)]
         public class TypeSearchTest_Class
         {
             public const string TypeId = "{EAC1DF8B-3F5D-4FE6-89FB-B180163C7086}";
@@ -51,6 +47,7 @@ namespace BladesTests.Core
             
             public string Name { set; get; }
         }
+        
         
     }
 }

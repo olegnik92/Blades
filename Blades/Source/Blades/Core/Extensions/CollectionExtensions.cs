@@ -7,7 +7,7 @@ namespace Blades.Core.Extensions
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
         {
-            return collection == null || collection.Any();
+            return collection == null || !collection.Any();
         }
 
     }
