@@ -10,7 +10,7 @@
         /// <summary>
         /// Ошибка при аутентификации пользователя
         /// </summary>
-        AuthorizationErrors,
+        AuthenticationErrors,
         
         /// <summary>
         /// У пользователя не хватает прав 

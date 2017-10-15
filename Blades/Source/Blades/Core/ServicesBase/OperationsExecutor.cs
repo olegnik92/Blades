@@ -65,7 +65,7 @@ namespace Blades.Core.ServicesBase
             catch (UnauthorizedAccessException error)
             {
                 _log.Error(error);
-                throw new OperationExecutionException(new Error(error), ExecutionStatus.AuthorizationErrors);
+                throw new OperationExecutionException(new Error(error), ExecutionStatus.AuthenticationErrors);
             }
             catch (Exception error)
             {
